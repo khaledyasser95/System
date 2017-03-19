@@ -10,6 +10,8 @@ import java.util.Map;
 public class Assembler {
     private final Map<String, OPERATION> opTable;
     private final Map<String, Integer> registerTable;
+    //Q:is making symbol table final a correct move ? this means it can only be intialized in the constructor once
+    //if we are going to do that then we need to put the constructor in pass 1
     private final Map<String, Integer> symbolTable;
 
     public Assembler() {

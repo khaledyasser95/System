@@ -17,8 +17,23 @@ declared /initialized in
 
 Notes:
 1-Instruction set can be initialized in the program or read from a text file
+2-4 instruction formats
+3-different addressing modes
+4-comments handling in reading
+5-unaccepted naming conventions like starting with name with an int
+6-ignoring case
+7-case of no label or no operand
+8-if extra space was added to alignment of program it should handle it
+
+
 
 Suggested strategy:
+
+divide and conquer:
+a-making a program that reads the assembly text file and separates efficiently labels,instructions and operands
+and prints them out
+b-saving names of assembler directives in a data structure because they don't count and have no memory address
+
 
 pass 1 :
 

@@ -6,6 +6,7 @@ import java.util.Map;
 /**
  * Created by ICY on 3/13/2017.
  */
+
 public class Instruc {
     private static final Map<String, OPERATION> OPERATIONTable;
     private static final Map<String, Integer> registerTable;
@@ -14,6 +15,8 @@ public class Instruc {
         //Operations can be done
         OPERATIONTable = new HashMap<>();
         registerTable = new HashMap<>();
+        //operation arguments: mnemonic,format,opcode
+        //Q: why not put 3/4 format operations as two different ones in map with same key?
         OPERATIONTable.put("ADD", new OPERATION("ADD", "3", "18"));
         OPERATIONTable.put("CLEAR", new OPERATION("CLEAR", "2", "B4"));
         OPERATIONTable.put("COMP", new OPERATION("COMP", "3/4", "28"));
@@ -36,6 +39,7 @@ public class Instruc {
         OPERATIONTable.put("TIXR", new OPERATION("TIXR", "2", "B8"));
         OPERATIONTable.put("WD", new OPERATION("WD", "3/4", "DC"));
         //SIC REGISTERS WITH NUMBER TO IDENTIFY
+        //Q: why did we put null at first one?
         registerTable.put(null, 0);
         registerTable.put("A", 0);
         registerTable.put("X", 1);

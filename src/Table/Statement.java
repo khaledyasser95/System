@@ -5,14 +5,27 @@ import java.io.Serializable;
 /**
  * Created by ICY on 3/14/2017.
  */
+
+/*
+for a class to be serialized successfully, two conditions must be met −
+
+The class must implement the java.io.Serializable interface.
+
+All of the fields in the class must be serializable. If a field is not serializable, it must be marked transient.
+
+resource: https://www.tutorialspoint.com/java/java_serialization.htm
+ */
+
+
 public class Statement implements Serializable, Comparable {
     private final String Label;
     private final String Operation;
     private final String[] Symbols;
     private final String _comment;
     private final boolean Extend;
-    private int _location;
+    private transient int _location;
 
+    //constructor for a statement containing comments
     private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
         Operation = operation;
@@ -20,28 +33,41 @@ public class Statement implements Serializable, Comparable {
         Symbols = symbols;
         _comment = comment;
     }
-
+    //constructor for a statement without a comment
     public Statement(String label, String operation, boolean extended, String[] symbols) {
+
         this(label, operation, extended, symbols, null);
     }
 
+    //constructor for a line containing only a comment
     public Statement(String comment) {
         this(null, ".", false, null, comment);
     }
+
     // Split the Line LABEL OPCODE OPERAND
     public static Statement parse(String statement) {
+        // array of strings each column contains a type: label,opcode,operand and comment (relatively)
+        //trim ommits extra spaces and split splits string into pieces every tab \t
         String[] split = statement.trim().split("\t");
 
+        //compareTo returns 0 if strings are the same order in a dictionary
+        //but if there is a comment after . wouldn't it NOT return 0? tried it in separate program and didn't return zero
+        //maybe what you mean is comparing split[0][0] to "." that will make more sense
         if (split[0].compareTo(".") == 0) {
             //check if comment
+            //this returns comment without the . as a new string
+            //and makes a new statement using the comment only constructor
             return new Statement(statement.substring(statement.indexOf('.') + 1));
+
         } else {
-            // If not so it will Statement to be fetched
+            // If not so it will be Statement to be fetched
             String label, operation;
             String[] symbols;
             boolean extended = false;
             int index = 0;
             //Check if there is label
+            //K: how did this check for a label  ? by comparing array length to 3 ?
+            //there could be format 1 instructions and also there could be a comment after the statement
             if (split.length == 3) {
                 label = split[index++];
             } else {
@@ -56,7 +82,9 @@ public class Statement implements Serializable, Comparable {
             // OPERAND
             symbols = new String[2];
             // ADD M,X example
+            //checking whether there are operands or not
             if (index < split.length) {
+                //checking if there are 2 operands (if comma is found then 2 operands)
                 int pos = split[index].indexOf(',');
                 // POS>0==0 because if not found index return -1
                 if (pos >= 0) {
@@ -64,12 +92,12 @@ public class Statement implements Serializable, Comparable {
                     symbols[0] = split[index].substring(0, pos);
                     //Take from pos and next one
                     symbols[1] = split[index].substring(pos + 1);
-                } else {
+                } else {//else if only one operand
                     // COMPR T
                     symbols[0] = split[index];
                     symbols[1] = null;
                 }
-            } else {
+            } else {//else if index>=split.length which means no operands
                 symbols[0] = symbols[1] = null;
             }
 
