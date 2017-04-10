@@ -5,7 +5,7 @@ import java.io.Serializable;
 /**
  * Created by ICY on 3/14/2017.
  */
-
+//comment as
 /*
 for a class to be serialized successfully, two conditions must be met −
 
@@ -25,11 +25,22 @@ public class Statement implements Serializable, Comparable {
     private final boolean Extend;
     private transient int _location;
 
+    public static void main(String args[])
+    {
+        String code="FIRST  STL    RETADR";
+        Statement s=parse(code);
+        System.out.println("Label: "+s.Label);
+        System.out.println("Label: "+s.Operation);
+
+    }
+
     //constructor for a statement containing comments
     private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
         Operation = operation;
         Extend = extended;
+
+        //array moving?
         Symbols = symbols;
         _comment = comment;
     }
@@ -44,12 +55,15 @@ public class Statement implements Serializable, Comparable {
         this(null, ".", false, null, comment);
     }
 
-    // Split the Line LABEL OPCODE OPERAND
+
+
+
+    // method Split the Line LABEL OPCODE OPERAND
     public static Statement parse(String statement) {
         // array of strings each column contains a type: label,opcode,operand and comment (relatively)
         //trim ommits extra spaces and split splits string into pieces every tab \t
-        String[] split = statement.trim().split("\t");
-
+       // String[] split = statement.trim().split("\t");
+        String[] split = statement.trim().split("   ");
         //compareTo returns 0 if strings are the same order in a dictionary
         //but if there is a comment after . wouldn't it NOT return 0? tried it in separate program and didn't return zero
         //maybe what you mean is comparing split[0][0] to "." that will make more sense
