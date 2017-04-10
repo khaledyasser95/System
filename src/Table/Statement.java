@@ -27,11 +27,11 @@ public class Statement implements Serializable, Comparable {
 
     public static void main(String args[])
     {
-        String code="FIRST  STL    RETADR";
+        String code="   STL   RETADR";
         Statement s=parse(code);
         System.out.println("Label: "+s.Label);
-        System.out.println("Label: "+s.Operation);
-
+        System.out.println("Opcode: "+s.Operation);
+        System.out.println("symbol: "+s.Symbols[0].toString());
     }
 
     //constructor for a statement containing comments
