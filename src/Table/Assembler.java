@@ -13,16 +13,16 @@ import java.util.Scanner;
  * Created by ICY on 3/14/2017.
  */
 public class Assembler {
-    private int location;
-    private int startAddress;
-    private int firstExecAddress;
-    private int Length;
-    private int baseAddress;
     private final Map<String, OPERATION> opTable;
     private final Map<String, Integer> registerTable;
     //Q:is making symbol table final a correct move ? this means it can only be intialized in the constructor once
     //if we are going to do that then we need to put the constructor in pass 1
     private final Map<String, Integer> symbolTable;
+    private int location;
+    private int startAddress;
+    private int firstExecAddress;
+    private int Length;
+    private int baseAddress;
 
     public Assembler() {
         opTable = Instruc.getOPERATIONTable();
@@ -31,6 +31,30 @@ public class Assembler {
         symbolTable.put(null, 0);
 
 
+    }
+
+    public static void main(String args[]) {
+        try {
+            Assembler asmb = new Assembler();
+            asmb.run(new File("AssemblyTest.asm"), new File("copy.o"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    void run(File input, File output) throws IOException {
+        File intermediateFile = new File(".assembler.tmp");
+
+        try {
+            intermediateFile.createNewFile();
+
+            pass1(input, intermediateFile);
+
+            //  processPass2(intermediateFile, output);
+        } finally {
+            intermediateFile.delete();
+        }
     }
 
     void pass1(File input, File output) throws IOException {
@@ -62,20 +86,6 @@ public class Assembler {
 
                             statement.setLocation(location = startAddress);
                             break;
-                        case "END":
-                            break;
-                        case "WORD":
-                            location += 3;
-
-                            break;
-                        case "RESW":
-                            location += 3 * Integer.parseInt(statement.operand1());
-
-                            break;
-                        case "RESB":
-                            location += Integer.parseInt(statement.operand1());
-
-                            break;
                         case "BYTE":
                             String s = statement.operand1();
 
@@ -88,9 +98,24 @@ public class Assembler {
                                     break;
                             }
                             break;
-                        case "BASE":
-                        case "NOBASE":
+
+                        case "WORD":
+                            location += 3;
+
                             break;
+                        case "RESW":
+                            location += 3 * Integer.parseInt(statement.operand1());
+
+                            break;
+                        case "RESB":
+                            location += Integer.parseInt(statement.operand1());
+
+                            break;
+
+
+                        case "END":
+                            break;
+
                         default:
                             if (opTable.containsKey(statement.operation())) {
                                 if (firstExecAddress < 0) {
@@ -115,7 +140,7 @@ public class Assembler {
                     }
                     System.out.println("Label: " + statement.label());
                     System.out.println("Opcode: " + statement.operation());
-                  //  System.out.println("symbol: " + statement.operand1().toString());
+                    //  System.out.println("symbol: " + statement.operand1().toString());
                     System.out.println("Locations: " + location);
                 } catch (Duplicate | WrongOperation e) {
                     System.out.println(e.getMessage());
@@ -126,16 +151,6 @@ public class Assembler {
 
 
         }
-    }
-
-    public static void main(String args[]) {
-        try {
-            Assembler asmb = new Assembler();
-            asmb.pass1(new File("AssemblyTest.asm"), new File("copy.o"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
 

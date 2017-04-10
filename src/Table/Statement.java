@@ -25,15 +25,6 @@ public class Statement implements Serializable, Comparable {
     private final boolean Extend;
     private transient int _location;
 
-    public static void main(String args[])
-    {
-        String code="   STL   RETADR";
-        Statement s=parse(code);
-        System.out.println("Label: "+s.Label);
-        System.out.println("Opcode: "+s.Operation);
-        System.out.println("symbol: "+s.Symbols[0].toString());
-    }
-
     //constructor for a statement containing comments
     private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
@@ -44,6 +35,7 @@ public class Statement implements Serializable, Comparable {
         Symbols = symbols;
         _comment = comment;
     }
+
     //constructor for a statement without a comment
     public Statement(String label, String operation, boolean extended, String[] symbols) {
 
@@ -55,14 +47,19 @@ public class Statement implements Serializable, Comparable {
         this(null, ".", false, null, comment);
     }
 
-
-
+    public static void main(String args[]) {
+        String code = "   STL   RETADR";
+        Statement s = parse(code);
+        System.out.println("Label: " + s.Label);
+        System.out.println("Opcode: " + s.Operation);
+        System.out.println("symbol: " + s.Symbols[0].toString());
+    }
 
     // method Split the Line LABEL OPCODE OPERAND
     public static Statement parse(String statement) {
         // array of strings each column contains a type: label,opcode,operand and comment (relatively)
         //trim ommits extra spaces and split splits string into pieces every tab \t
-       String[] split = statement.trim().split("\t");
+        String[] split = statement.trim().split("\t");
         //String[] split = statement.trim().split("   ");
         //compareTo returns 0 if strings are the same order in a dictionary
         //but if there is a comment after . wouldn't it NOT return 0? tried it in separate program and didn't return zero
