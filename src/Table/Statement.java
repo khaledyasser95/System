@@ -59,8 +59,8 @@ public class Statement implements Serializable, Comparable {
     public static Statement parse(String statement) {
         // array of strings each column contains a type: label,opcode,operand and comment (relatively)
         //trim ommits extra spaces and split splits string into pieces every tab \t
-        String[] split = statement.trim().split("\t");
-        //String[] split = statement.trim().split("   ");
+        //String[] split = statement.trim().split("\t");
+        String[] split = statement.trim().split("\\s+");
         //compareTo returns 0 if strings are the same order in a dictionary
         //but if there is a comment after . wouldn't it NOT return 0? tried it in separate program and didn't return zero
         //maybe what you mean is comparing split[0][0] to "." that will make more sense
