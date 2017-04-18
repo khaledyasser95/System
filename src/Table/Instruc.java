@@ -1,6 +1,8 @@
 package Table;
-
+//start with package table in other project when copy
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -11,10 +13,15 @@ public class Instruc {
     private static final Map<String, OPERATION> OPERATIONTable;
     private static final Map<String, Integer> registerTable;
 
+
+
+    private static final List<String> directives;
     static {
         //Operations can be done
         OPERATIONTable = new HashMap<>();
         registerTable = new HashMap<>();
+        directives=new ArrayList<>();
+
         //operation arguments: mnemonic,format,opcode
         //Q: why not put 3/4 format operations as two different ones in map with same key?
         OPERATIONTable.put("ADD", new OPERATION("ADD", "3", "18"));
@@ -49,6 +56,14 @@ public class Instruc {
         registerTable.put("T", 5);
         registerTable.put("F", 6);
         registerTable.put("SW", 9);
+        directives.add("START");
+        directives.add("END");
+        directives.add("BYTE");
+        directives.add("WORD");
+        directives.add("RESW");
+        directives.add("RESB");
+
+
     }
 
     public static Map<String, OPERATION> getOPERATIONTable() {
@@ -58,4 +73,9 @@ public class Instruc {
     public static Map<String, Integer> getRegisterTable() {
         return registerTable;
     }
+
+    public static List<String> getDirectives() {
+        return directives;
+    }
+
 }

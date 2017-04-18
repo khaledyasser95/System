@@ -1,5 +1,7 @@
 package Table;
 
+
+
 import java.io.Serializable;
 
 /**
@@ -35,7 +37,7 @@ public class Statement implements Serializable, Comparable {
     }
 
     //constructor for a statement containing comments
-    private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
+    public Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
         Operation = operation;
         Extend = extended;
@@ -98,90 +100,90 @@ public class Statement implements Serializable, Comparable {
             /*1. bytes 1–8 label  2. 9 blank   3. 10–15 operation code
             4. 16–17 blank  5. 18–35 operand   6. 36–66 comment
             */
-                //get all from their assigned areas in the format and removing spaces
-         label=line.substring(0,7).trim();
-         operation=line.substring(9,14).trim();
-         operands=line.substring(17,34).trim();
-         _comment=line.substring(35,65).trim();
+            //get all from their assigned areas in the format and removing spaces
+            label=line.substring(0,7).trim();
+            operation=line.substring(9,14).trim();
+            operands=line.substring(17,34).trim();
+            _comment=line.substring(35,65).trim();
 
-         //methods yet to be implemented
+            //methods yet to be implemented
             //check if label exists in symbol table if so give error
-         if(labelExists(label))
-         {
-             labelExistsError(label);
-             //stop parsing line only but won't stop reading lines to check all errors in program, or what?
-             stopParsingLine();
-         }
-         else //label not in symTab
-         {
-             //if(labelValid)  //check label written in correct format or not
-             //save label in symbol table with its location
-             saveLabel(label,_location);
-             //check if operation doesn't exist  in op table (provided that label exists)
-             //handels if operation starts with +
-             if(!operationExists(operation))
-             {
-                 //can give line number also as operand and make errors class
-                 operationNotExistError(operation);
-                 //stop parsing line only but won't stop reading lines to check all errors in program, or what?
-                 stopParsingLine();
-             }
-             else //operation  exists in op-table
-             {
-                 //method to check where operation is Start
-                 //and if not checks format and increments location
-                 //careful java is call by value
-                 addLocationAccordingToFormat(operation,_location);
-                 //check operands and save them to symbols:
-                 //and according to format
-                 symbols=new String[2];
+            if(labelExists(label))
+            {
+                labelExistsError(label);
+                //stop parsing line only but won't stop reading lines to check all errors in program, or what?
+                stopParsingLine();
+            }
+            else //label not in symTab
+            {
+                //if(labelValid)  //check label written in correct format or not
+                //save label in symbol table with its location
+                saveLabel(label,_location);
+                //check if operation doesn't exist  in op table (provided that label exists)
+                //handels if operation starts with +
+                if(!operationExists(operation))
+                {
+                    //can give line number also as operand and make errors class
+                    operationNotExistError(operation);
+                    //stop parsing line only but won't stop reading lines to check all errors in program, or what?
+                    stopParsingLine();
+                }
+                else //operation  exists in op-table
+                {
+                    //method to check where operation is Start
+                    //and if not checks format and increments location
+                    //careful java is call by value
+                    addLocationAccordingToFormat(operation,_location);
+                    //check operands and save them to symbols:
+                    //and according to format
+                    symbols=new String[2];
 
-                 int commaPosition=operandsAndComment.indexOf(',');
-                 //if two operands
-                 if(commaPosition>0)
-                 {
-                     symbols[0]=operandsAndComment.substring(0,commaPosition);
-                     int dotPosition=operandsAndComment.indexOf('.');
-                     //if there exists comment after operands
-                     if(dotPosition>=0)
-                     {
-                         //2nd operand if from char after comma till dot
-                         symbols[1]=operandsAndComment.substring(commaPosition+1,dotPosition);
-                         _comment=operandsAndComment.substring(dotPosition+1).trim();
+                    int commaPosition=operandsAndComment.indexOf(',');
+                    //if two operands
+                    if(commaPosition>0)
+                    {
+                        symbols[0]=operandsAndComment.substring(0,commaPosition);
+                        int dotPosition=operandsAndComment.indexOf('.');
+                        //if there exists comment after operands
+                        if(dotPosition>=0)
+                        {
+                            //2nd operand if from char after comma till dot
+                            symbols[1]=operandsAndComment.substring(commaPosition+1,dotPosition);
+                            _comment=operandsAndComment.substring(dotPosition+1).trim();
 
-                     }
-                     else //if no comment then take 2nd operand with no spaces
-                        symbols[1]=operandsAndComment.substring(commaPosition+1).trim();
-                 }
-                 else //if 1 operand only
-                 {
+                        }
+                        else //if no comment then take 2nd operand with no spaces
+                            symbols[1]=operandsAndComment.substring(commaPosition+1).trim();
+                    }
+                    else //if 1 operand only
+                    {
 
-                 }
-
-
-             }
+                    }
 
 
-
-
-
-         }
+                }
 
 
 
 
 
+            }
 
 
-         //check if there is a comment after the code area
-         if(_comment.indexOf('.')>=0)
-         {
-             _comment=_comment.substring(indexOf('.')+1);
-         }
-         else
-         {
-             _comment=null;
-         }
+
+
+
+
+
+            //check if there is a comment after the code area
+            if(_comment.indexOf('.')>=0)
+            {
+                _comment=_comment.substring(indexOf('.')+1);
+            }
+            else
+            {
+                _comment=null;
+            }
 
         }
 
@@ -248,7 +250,7 @@ public class Statement implements Serializable, Comparable {
     public static Statement parse(String statement) {
         // array of strings each column contains a type: label,opcode,operand and comment (relatively)
         //trim ommits extra spaces and split splits string into pieces every tab \t
-       // String[] split = statement.trim().split("\t");
+        // String[] split = statement.trim().split("\t");
 
         //spliting at a space has major problem if spaces are left in label's place
 
