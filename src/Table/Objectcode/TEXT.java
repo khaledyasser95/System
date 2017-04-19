@@ -7,11 +7,10 @@ import java.util.List;
  * Created by ICY on 4/12/2017.
  */
 public class TEXT implements RecordCollector {
-    private final int startAddress;
-    private int length;
-    private final List<String> objectCodes;
-
     public static final int MAX_LENGTH = 0x20;
+    private final int startAddress;
+    private final List<String> objectCodes;
+    private int length;
 
     public TEXT(int startAddress) {
         this.startAddress = startAddress;
@@ -19,6 +18,7 @@ public class TEXT implements RecordCollector {
         objectCodes = new ArrayList<>();
 
     }
+
     public boolean add(String objectCode) {
         if (objectCode.length() == 0) {
             return true;

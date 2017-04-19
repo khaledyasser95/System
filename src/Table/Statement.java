@@ -30,7 +30,6 @@ public class Statement implements Serializable, Comparable {
         Label = label;
         Operation = operation;
         Extend = extended;
-
         //array moving?
         Symbols = symbols;
         _comment = comment;
@@ -47,24 +46,17 @@ public class Statement implements Serializable, Comparable {
         this(null, ".", false, null, comment);
     }
 
-    public static void main(String args[]) {
-        String code = "   STL   RETADR";
-        Statement s = parse(code);
-        System.out.println("Label: " + s.Label);
-        System.out.println("Opcode: " + s.Operation);
-        System.out.println("symbol: " + s.Symbols[0].toString());
-    }
-
     // method Split the Line LABEL OPCODE OPERAND
     public static Statement parse(String statement) {
-        // array of strings each column contains a type: label,opcode,operand and comment (relatively)
+        // array of string statics each column contains a type: label,opcode,operand and comment (relatively)
         //trim ommits extra spaces and split splits string into pieces every tab \t
-        //String[] split = statement.trim().split("\t");
         String[] split = statement.trim().split("\\s+");
         //compareTo returns 0 if strings are the same order in a dictionary
         //but if there is a comment after . wouldn't it NOT return 0? tried it in separate program and didn't return zero
         //maybe what you mean is comparing split[0][0] to "." that will make more sense
-        if (split[0].compareTo(".") == 0) {
+        //split[0].compareTo(".") == 0
+        if (split[0].charAt(0) == '.') {
+
             //check if comment
             //this returns comment without the . as a new string
             //and makes a new statement using the comment only constructor
@@ -84,8 +76,9 @@ public class Statement implements Serializable, Comparable {
             } else {
                 label = null;
             }
-            //Check Operation it will be in 1 or 2 anyway
+            //Get Operation code
             operation = split[index++];
+            //check if the operation is Format 4
             if (operation.charAt(0) == '+') {
                 extended = true;
                 operation = operation.substring(1);
@@ -99,9 +92,9 @@ public class Statement implements Serializable, Comparable {
                 int pos = split[index].indexOf(',');
                 // POS>0==0 because if not found index return -1
                 if (pos >= 0) {
-                    //Take from 0 to Pos-1
+                    //Take from 0 to Pos-1 M,
                     symbols[0] = split[index].substring(0, pos);
-                    //Take from pos and next one
+                    //Take from pos and next one ,X
                     symbols[1] = split[index].substring(pos + 1);
                 } else {//else if only one operand
                     // COMPR T

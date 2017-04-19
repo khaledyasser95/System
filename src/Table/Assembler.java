@@ -1,16 +1,18 @@
 package Table;
 //just a first comment to try commits
 
+import Table.Objectcode.*;
+
 import java.io.*;
 import java.util.*;
-
-import Table.Objectcode.*;
 
 /**
  * Created by ICY on 3/14/2017.
  */
 public class Assembler {
+
     private final Map<String, OPERATION> opTable;
+
     private final Map<String, Integer> registerTable;
     //Q:is making symbol table final a correct move ? this means it can only be intialized in the constructor once
     //if we are going to do that then we need to put the constructor in pass 1
@@ -22,9 +24,12 @@ public class Assembler {
     private int baseAddress;
 
     public Assembler() {
+        //Pointing the optable to the operation in the instruction class
         opTable = Instruc.getOPERATIONTable();
+        //Pointing the registertable to the register inside the instruction class
         registerTable = Instruc.getRegisterTable();
         symbolTable = new HashMap<>();
+        //Initializzing the symbol table
         symbolTable.put(null, 0);
 
 
@@ -33,8 +38,8 @@ public class Assembler {
     public static void main(String args[]) {
         try {
             Assembler asmb = new Assembler();
-          //  File assembly = new File ("copy.asm");
-            asmb.run(new File("input_fibonacci.txt"), new File("Listing.txt"),new File("symb.txt"),new File("HTMI.o"));
+            //  File assembly = new File ("copy.asm");
+            asmb.run(new File("input_fibonacci.txt"), new File("Listing.txt"), new File("symb.txt"), new File("HTMI.o"));
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -42,29 +47,54 @@ public class Assembler {
 
     }
 
-    void run(File input, File output,File output2,File output3) throws IOException,ClassNotFoundException  {
+    /**
+     * THIS METHOD READ THE INPUT FILE AND SEND IT TO BE PASSED TO PASS 1 AND PASS2 THEN RETURN THE OUTPUT INTO FILES
+     *
+     * @param input   ASSEMBLY FILE
+     * @param output  LISTING FILE
+     * @param output2 SYMBOL TABLE FILE
+     * @param output3 HTMI FILE
+     * @throws IOException            CHECK IF FILE ERROR
+     * @throws ClassNotFoundException IF CLASS IS NOT AVAILABLE
+     */
+    void run(File input, File output, File output2, File output3) throws IOException, ClassNotFoundException {
+        //creating temporary file to take the output from pass 1 to be translated to object code in pass 2
         File intermediateFile = new File(".assembler.tmp");
-
         try {
             intermediateFile.createNewFile();
+            pass1(input, output, output2, intermediateFile);
 
-            pass1(input, output,output2,intermediateFile);
-
-              pass2(intermediateFile, output3);
+            pass2(intermediateFile, output3);
         } finally {
             intermediateFile.delete();
         }
     }
 
-    void pass1(File input, File output,File output2,File output3) throws IOException {
+    /**
+     * PASS 1: READ EACH STATEMENT IN FILE AND DETECT TYPE OF STATEMENT
+     * IF LABEL: ITS ADDED TO SYMBOL TABLE WITH ITS LOCATION AND CHECK IF ITS NOT DUPLICATED  AND PRINT THE VALUES INSIDE THE SYMBOLTABLE FILE
+     * IF COMMENT: THEN ITS IGNORED
+     * OPERATION : CHECK THE OPERATION IF AVAILABLE THEN IF NORMAL OPERATION (DEFAULT) THEN IT CHECKS THE FORMAT
+     * IT PRINT INSIDE THE LISTING FILE
+     * RETURN OBJECT INTO INTERMEDIATE FILE
+     *
+     * @param input   ASSEMBLY FILE
+     * @param output  LISTING FILE
+     * @param output2 SYMBOL TABLE
+     * @param output3 INTERMEDIATE FILE
+     * @throws IOException FILE ERROR
+     */
+
+    void pass1(File input, File output, File output2, File output3) throws IOException {
         try (Scanner scanner = new Scanner(input);
              FileOutputStream ostream = new FileOutputStream(output);
              FileOutputStream ostream3 = new FileOutputStream(output3);
+             //OBJECT OUTPUT must get from a Serializable class
              ObjectOutputStream objOutputStream = new ObjectOutputStream(ostream3);
 
-            FileOutputStream ostream2 = new FileOutputStream(output2);
+             FileOutputStream ostream2 = new FileOutputStream(output2);
              PrintWriter x = new PrintWriter(ostream);
-             PrintWriter y= new PrintWriter(ostream2)
+             PrintWriter y = new PrintWriter(ostream2)
 
         ) {
             location = startAddress = 0;
@@ -84,7 +114,7 @@ public class Assembler {
 
                         } else {
                             symbolTable.put(statement.label(), location);
-                            y.println(location+"\t"+ statement.label());
+                            y.println(location + "\t" + statement.label());
                         }
                     }
                     //check operation
@@ -152,7 +182,7 @@ public class Assembler {
                     x.println(statement);
                     objOutputStream.writeObject(statement);
                 } catch (Duplicate | WrongOperation e) {
-                   x.println(e.getMessage());
+                    x.println(e.getMessage());
                     y.println(e.getMessage());
                 }
                 Length = location - startAddress;
@@ -163,12 +193,18 @@ public class Assembler {
         }
     }
 
-    void pass2(File input, File output) throws IOException,ClassNotFoundException{
+    /**
+     * @param input  READ THE ASSEMBLY FILE
+     * @param output THE HTMI FILE
+     * @throws IOException
+     * @throws ClassNotFoundException
+     */
+    void pass2(File input, File output) throws IOException, ClassNotFoundException {
         try (FileInputStream istream = new FileInputStream(input);
              ObjectInputStream objInputStream = new ObjectInputStream(istream);
              FileWriter objectProgram = new FileWriter(output)
 
-         )
+        )
 
         {
 
@@ -220,6 +256,10 @@ public class Assembler {
         }
     }
 
+    /**
+     * @param statement
+     * @return
+     */
     private String Instruction(Statement statement) {
         String objCode = "";
 
@@ -243,7 +283,8 @@ public class Assembler {
                     final int b = 1 << 2;
                     final int p = 1 << 1;
                     final int e = 1;
-
+                    //The radix parameter is used to specify which numeral system to be used, for example, a radix of 16 (hexadecimal)
+                    // indicates that the number in the string should be parsed from a hexadecimal number to a decimal number.
                     int code = Integer.parseInt(opTable.get(statement.operation()).getOpcode(), 16) << 4;
                     String operand = statement.operand1();
 
@@ -333,11 +374,6 @@ public class Assembler {
 
         return objCode;
     }
-
-
-
-
-
 
 
 }

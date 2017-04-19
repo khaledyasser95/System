@@ -9,6 +9,7 @@ public class END implements RecordCollector {
     public END(int startAddress) {
         this.startAddress = startAddress;
     }
+
     @Override
     public String toObjectProgram() {
         return String.format("E%1$06X", startAddress);
