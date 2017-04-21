@@ -120,13 +120,16 @@ public class Assembler {
 
                         } else {
                             symbolTable.put(statement.label(), location);
-                            y.println(location + "\t" + statement.label());
+                            //made it print hexa:
+                            y.println(Integer.toHexString(location).toUpperCase() + "\t" + statement.label());
+
                         }
                     }
                     //check operation
                     switch (statement.operation()) {
                         case "START"://TODO : integer after start is hexa decimal not decimal
-                            startAddress = Integer.parseInt(statement.operand1());
+                            //K made radix =16 because it is a hexa decimal number
+                            startAddress = Integer.parseInt(statement.operand1(),16);
 
                             statement.setLocation(location = startAddress);
                             break;
@@ -206,6 +209,8 @@ public class Assembler {
      * @throws ClassNotFoundException
      */
     void pass2(File input, File output) throws IOException, ClassNotFoundException {
+        //input file here is intermediate file which is listing file which is one that saves statement objects
+        //output file is the HTME file
         try (FileInputStream istream = new FileInputStream(input);
              ObjectInputStream objInputStream = new ObjectInputStream(istream);
              FileWriter objectProgram = new FileWriter(output)
@@ -224,7 +229,7 @@ public class Assembler {
                 if (statement.isComment()) {
                     continue;
                 }
-
+                //compare operation of statement object to "START"
                 if (statement.compareTo("START") == 0) {
 
                     objectProgram.write(new Header(statement.label(), startAddress, Length).toObjectProgram() + '\n');
@@ -268,8 +273,8 @@ public class Assembler {
      */
     private String Instruction(Statement statement) {
         String objCode = "";
-
-        if (opTable.containsKey(statement.operation())) {
+            //if operation of statement is a valid operation
+        if (opTable.containsKey(statement.operation())) {//cases of format of operation
             switch (opTable.get(statement.operation()).getFormat()) {
                 case "1":
                     objCode = opTable.get(statement.operation()).getOpcode();
@@ -282,8 +287,9 @@ public class Assembler {
                     objCode += Integer.toHexString(registerTable.get(statement.operand2())).toUpperCase();
 
                     break;
+
                 case "3/4":
-                    final int n = 1 << 5;
+                    final int n = 1 << 5;// n=100000 in binary
                     final int i = 1 << 4;
                     final int x = 1 << 3;
                     final int b = 1 << 2;
@@ -318,8 +324,9 @@ public class Assembler {
                         }
 
                         int disp;
+                        //if operand is not a label
                         if (symbolTable.get(operand) == null) {
-                            disp = Integer.parseInt(operand);
+                           disp = Integer.parseInt(operand);
                         } else {
                             int targetAddress = symbolTable.get(operand);
 
