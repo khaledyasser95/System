@@ -57,10 +57,22 @@ public class Instruc {
         OPERATIONTable.put("SIO", new OPERATION("SIO", "1", "F0"));
         OPERATIONTable.put("SSK", new OPERATION("SSK", "3/4", "EC"));
         OPERATIONTable.put("STA", new OPERATION("STA", "3/4", "0C"));
+        OPERATIONTable.put("STB", new OPERATION("STB", "3/4", "78"));
         OPERATIONTable.put("STCH", new OPERATION("STCH", "3/4", "54"));
+        OPERATIONTable.put("STF", new OPERATION("STF", "3/4", "80"));
+        OPERATIONTable.put("STI", new OPERATION("STI", "3/4", "D4"));
         OPERATIONTable.put("STL", new OPERATION("STL", "3/4", "14"));
         OPERATIONTable.put("STX", new OPERATION("STX", "3/4", "10"));
+        OPERATIONTable.put("STS", new OPERATION("STS", "3/4", "7C"));
+        OPERATIONTable.put("STSW", new OPERATION("STSW", "3/4", "E8"));
+        OPERATIONTable.put("SUB", new OPERATION("SUB", "3/4", "1C"));
+        OPERATIONTable.put("SUBF", new OPERATION("SUBF", "3/4", "5C"));
+        OPERATIONTable.put("SUBR", new OPERATION("SUBR", "2", "94"));
+        OPERATIONTable.put("SVC", new OPERATION("SVC", "2", "B0"));
+        OPERATIONTable.put("STT", new OPERATION("STT", "3/4", "84"));
         OPERATIONTable.put("TD", new OPERATION("TD", "3/4", "E0"));
+        OPERATIONTable.put("TIO", new OPERATION("TIO", "1", "F8"));
+        OPERATIONTable.put("TIX", new OPERATION("TIX", "3/4", "2C"));
         OPERATIONTable.put("TIXR", new OPERATION("TIXR", "2", "B8"));
         OPERATIONTable.put("WD", new OPERATION("WD", "3/4", "DC"));
         //SIC REGISTERS WITH NUMBER TO IDENTIFY

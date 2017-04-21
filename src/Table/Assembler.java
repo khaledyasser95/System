@@ -105,7 +105,7 @@ public class Assembler {
             firstExecAddress = -1;
             //while not end of file
             while (scanner.hasNext()) {
-                try {
+                try {//try reading lines from file
                     //read each line and parse it into a statement
                     Statement statement = Statement.parse(scanner.nextLine());
                     if (statement.isComment()) {
