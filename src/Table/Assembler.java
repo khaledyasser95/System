@@ -29,7 +29,7 @@ public class Assembler {
         //Pointing the registertable to the register inside the instruction class
         registerTable = Instruc.getRegisterTable();
         symbolTable = new HashMap<>();
-        //Initializzing the symbol table
+        //Initializing the symbol table
         symbolTable.put(null, 0);
 
 
@@ -37,9 +37,9 @@ public class Assembler {
 
     public static void main(String args[]) {
         try {
-            Assembler asmb = new Assembler();
+            Assembler assembler = new Assembler();
             //  File assembly = new File ("copy.asm");
-            asmb.run(new File("input_fibonacci.txt"), new File("Listing.txt"), new File("symb.txt"), new File("HTMI.o"));
+            assembler.run(new File("input_fibonacci.txt"), new File("Listing.txt"), new File("symb.txt"), new File("HTMI.o"));
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -86,21 +86,27 @@ public class Assembler {
      */
 
     void pass1(File input, File output, File output2, File output3) throws IOException {
+
         try (Scanner scanner = new Scanner(input);
              FileOutputStream ostream = new FileOutputStream(output);
              FileOutputStream ostream3 = new FileOutputStream(output3);
              //OBJECT OUTPUT must get from a Serializable class
+             //OOS is for writing an object into a file
              ObjectOutputStream objOutputStream = new ObjectOutputStream(ostream3);
 
              FileOutputStream ostream2 = new FileOutputStream(output2);
              PrintWriter x = new PrintWriter(ostream);
              PrintWriter y = new PrintWriter(ostream2)
 
-        ) {
+        )//all past are parameters for this try block
+                //try block:
+        {
             location = startAddress = 0;
             firstExecAddress = -1;
+            //while not end of file
             while (scanner.hasNext()) {
                 try {
+                    //read each line and parse it into a statement
                     Statement statement = Statement.parse(scanner.nextLine());
                     if (statement.isComment()) {
                         continue;
@@ -119,7 +125,7 @@ public class Assembler {
                     }
                     //check operation
                     switch (statement.operation()) {
-                        case "START":
+                        case "START"://TODO : integer after start is hexa decimal not decimal
                             startAddress = Integer.parseInt(statement.operand1());
 
                             statement.setLocation(location = startAddress);
@@ -156,7 +162,7 @@ public class Assembler {
                         case "BASE":
                             break;
 
-
+                        //not a directive
                         default:
                             if (opTable.containsKey(statement.operation())) {
                                 if (firstExecAddress < 0) {
@@ -190,7 +196,7 @@ public class Assembler {
             }
 
 
-        }
+        }//end try
     }
 
     /**
@@ -312,7 +318,6 @@ public class Assembler {
                         }
 
                         int disp;
-
                         if (symbolTable.get(operand) == null) {
                             disp = Integer.parseInt(operand);
                         } else {
@@ -327,7 +332,6 @@ public class Assembler {
                                     code |= p;
                                 } else {
                                     code |= b;
-
                                     disp = targetAddress - baseAddress;
                                 }
                             }

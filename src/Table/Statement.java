@@ -30,7 +30,6 @@ public class Statement implements Serializable, Comparable {
         Label = label;
         Operation = operation;
         Extend = extended;
-        //array moving?
         Symbols = symbols;
         _comment = comment;
     }
@@ -41,6 +40,7 @@ public class Statement implements Serializable, Comparable {
         this(label, operation, extended, symbols, null);
     }
 
+    //why put . in operation not null?
     //constructor for a line containing only a comment
     public Statement(String comment) {
         this(null, ".", false, null, comment);
@@ -49,7 +49,7 @@ public class Statement implements Serializable, Comparable {
     // method Split the Line LABEL OPCODE OPERAND
     public static Statement parse(String statement) {
         // array of string statics each column contains a type: label,opcode,operand and comment (relatively)
-        //trim ommits extra spaces and split splits string into pieces every tab \t
+        //trim ommits extra  spaces and split splits string into pieces every tab \t
         String[] split = statement.trim().split("\\s+");
         //compareTo returns 0 if strings are the same order in a dictionary
         //but if there is a comment after . wouldn't it NOT return 0? tried it in separate program and didn't return zero
@@ -63,6 +63,7 @@ public class Statement implements Serializable, Comparable {
             return new Statement(statement.substring(statement.indexOf('.') + 1));
 
         } else {
+
             // If not so it will be Statement to be fetched
             String label, operation;
             String[] symbols;
@@ -71,6 +72,9 @@ public class Statement implements Serializable, Comparable {
             //Check if there is label
             //K: how did this check for a label  ? by comparing array length to 3 ?
             //there could be format 1 instructions and also there could be a comment after the statement
+            /*TODO : this parse for format 1 instns and directives with no operand will not assign label +
+                doesn't handle if a comment comes after a statement
+             */
             if (split.length == 3) {
                 label = split[index++];
             } else {
@@ -142,6 +146,7 @@ public class Statement implements Serializable, Comparable {
     }
 
     @Override
+    //method to make the statement into a line again
     public String toString() {
         // Make 4 digit string
         String s = String.format("%1$04X", _location) + "\t";

@@ -18,6 +18,16 @@ public class Instruc {
         //operation arguments: mnemonic,format,opcode
         //Q: why not put 3/4 format operations as two different ones in map with same key?
         OPERATIONTable.put("ADD", new OPERATION("ADD", "3", "18"));
+        OPERATIONTable.put("ADDF", new OPERATION("ADDF", "3/4", "58"));
+        OPERATIONTable.put("ADDR", new OPERATION("ADDR", "2", "90"));
+        OPERATIONTable.put("AND", new OPERATION("AND", "3/4", "40"));
+        OPERATIONTable.put("DIV", new OPERATION("DIV", "3/4", "24"));
+        OPERATIONTable.put("DIVF", new OPERATION("DIVF", "3/4", "64"));
+        OPERATIONTable.put("DIVR", new OPERATION("DIVR", "2", "9C"));
+        OPERATIONTable.put("FIX", new OPERATION("FIX", "1", "C4"));
+        OPERATIONTable.put("FLOAT", new OPERATION("FLOAT", "1", "C0"));
+        OPERATIONTable.put("HIO", new OPERATION("HIO", "1", "F4"));
+        OPERATIONTable.put("JGT", new OPERATION("JGT", "3/4", "34"));
         OPERATIONTable.put("CLEAR", new OPERATION("CLEAR", "2", "B4"));
         OPERATIONTable.put("COMP", new OPERATION("COMP", "3/4", "28"));
         OPERATIONTable.put("COMPR", new OPERATION("COMPR", "2", "A0"));
@@ -28,9 +38,24 @@ public class Instruc {
         OPERATIONTable.put("LDA", new OPERATION("LDA", "3/4", "00"));
         OPERATIONTable.put("LDB", new OPERATION("LDB", "3/4", "68"));
         OPERATIONTable.put("LDCH", new OPERATION("LDCH", "3/4", "50"));
+        OPERATIONTable.put("LDF", new OPERATION("LDF", "3/4", "70"));
+        OPERATIONTable.put("LDL", new OPERATION("LDL", "3/4", "08"));
+        OPERATIONTable.put("LDS", new OPERATION("LDS", "3/4", "6C"));
         OPERATIONTable.put("LDT", new OPERATION("LDT", "3/4", "74"));
+        OPERATIONTable.put("LDX", new OPERATION("LDX", "3/4", "04"));
+        OPERATIONTable.put("LPS", new OPERATION("LPS", "3/4", "D0"));
+        OPERATIONTable.put("MUL", new OPERATION("MUL", "3/4", "20"));
+        OPERATIONTable.put("MULF", new OPERATION("MULF", "3/4", "60"));
+        OPERATIONTable.put("MULR", new OPERATION("MULR", "2", "68"));
+        OPERATIONTable.put("NORM", new OPERATION("NORM", "1", "C8"));
+        OPERATIONTable.put("OR", new OPERATION("OR", "1", "44"));
         OPERATIONTable.put("RD", new OPERATION("RD", "3/4", "D8"));
+        OPERATIONTable.put("RMO", new OPERATION("RMO", "2", "AC"));
         OPERATIONTable.put("RSUB", new OPERATION("RSUB", "3/4", "4C"));
+        OPERATIONTable.put("SHIFTL", new OPERATION("SHIFTL", "2", "A4"));
+        OPERATIONTable.put("SHIFTR", new OPERATION("SHIFTR", "2", "A8"));
+        OPERATIONTable.put("SIO", new OPERATION("SIO", "1", "F0"));
+        OPERATIONTable.put("SSK", new OPERATION("SSK", "3/4", "EC"));
         OPERATIONTable.put("STA", new OPERATION("STA", "3/4", "0C"));
         OPERATIONTable.put("STCH", new OPERATION("STCH", "3/4", "54"));
         OPERATIONTable.put("STL", new OPERATION("STL", "3/4", "14"));

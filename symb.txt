@@ -1,18 +1,12 @@
 0	FIBO
 0	FIRST
-Wrong operation : LDS
-11	LENGTH
-14	RDREC
-16	RLOOP
-Wrong operation : JGT
-38	INPUT
-39	WRREC
-Wrong operation : LDX
-Wrong operation : LDS
-45	WLOOP
-Wrong operation : ADDR
+14	LENGTH
+17	RDREC
+19	RLOOP
+44	INPUT
+45	WRREC
+57	WLOOP
 Wrong operation : STS
-Wrong operation : LDS
-65	OUTPUT
-66	VALUE1
-69	VALUE2
+82	OUTPUT
+83	VALUE1
+86	VALUE2
