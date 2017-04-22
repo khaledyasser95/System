@@ -80,6 +80,20 @@ public class Statement implements Serializable, Comparable {
             } else {
                 label = null;
             }
+            //newly added
+            String check=null;
+            if(split.length==2)
+            {
+                check=split[1];
+                if(check.equals("RSUB"))
+                    label=split[index++];
+            }
+
+
+
+
+
+
             //Get Operation code
             operation = split[index++];
             //check if the operation is Format 4

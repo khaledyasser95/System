@@ -376,7 +376,9 @@ public class Assembler {
                     break;
             }
         } else if (statement.compareTo("WORD") == 0) {
-            objCode = String.format("%06X", statement.operand1());
+
+            //2nd change made it integer+parse int
+            objCode = String.format("%06X", Integer.parseInt(statement.operand1()));
         } else if (statement.compareTo("BASE") == 0) {
             baseAddress = symbolTable.get(statement.operand1());
         } else if (statement.compareTo("NOBASE") == 0) {
