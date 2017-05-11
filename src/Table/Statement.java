@@ -85,7 +85,7 @@ public class Statement implements Serializable, Comparable {
             if(split.length==2)
             {
                 check=split[1];
-                if(check.equals("RSUB"))
+                if(check.equals("RSUB") )
                     label=split[index++];
             }
 

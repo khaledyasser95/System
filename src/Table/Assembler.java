@@ -126,7 +126,9 @@ public class Assembler {
                         }
                     }
                     //check operation
+                    boolean error=false;
                     switch (statement.operation()) {
+
                         case "START"://TODO : integer after start is hexa decimal not decimal
                             //K made radix =16 because it is a hexa decimal number
                             startAddress = Integer.parseInt(statement.operand1(),16);
@@ -151,10 +153,28 @@ public class Assembler {
 
                             break;
                         case "RESW":
-                            location += 3 * Integer.parseInt(statement.operand1());
 
+                            for(int i=0;i<statement.operand1().length();i++)
+                            {
+                                if(!Character.isLetterOrDigit(statement.operand1().charAt(i)))
+                                    System.out.println("can't use this symbol   "+statement.operand1().charAt(i)+"  in operation: "+statement.operand1());
+                                error=true;
+                            }
+                            if(!error)
+                            location += 3 * Integer.parseInt(statement.operand1());
+                            else
+                                location+=3;
                             break;
                         case "RESB":
+
+                            for(int i=0;i<statement.operand1().length();i++)
+                            {
+
+                                if(!Character.isLetterOrDigit(statement.operand1().charAt(i)))
+                                    System.out.println("can't use this symbol   "+statement.operand1().charAt(i)+"  in operation: "+statement.operand1());
+                                error=true;
+                            }
+
                             location += Integer.parseInt(statement.operand1());
 
                             break;
@@ -163,6 +183,8 @@ public class Assembler {
                         case "END":
                             break;
                         case "BASE":
+                            break;
+                        case "NOBASE":
                             break;
 
                         //not a directive
@@ -282,7 +304,6 @@ public class Assembler {
                     break;
                 case "2":
                     objCode = opTable.get(statement.operation()).getOpcode();
-
                     objCode += Integer.toHexString(registerTable.get(statement.operand1())).toUpperCase();
                     objCode += Integer.toHexString(registerTable.get(statement.operand2())).toUpperCase();
 
@@ -299,10 +320,18 @@ public class Assembler {
                     // indicates that the number in the string should be parsed from a hexadecimal number to a decimal number.
                     int code = Integer.parseInt(opTable.get(statement.operation()).getOpcode(), 16) << 4;
                     String operand = statement.operand1();
-
+                    //if no operand
                     if (operand == null) {
+                        //put zeros in displacement
                         code = (code | n | i) << 12; // for RSUB, NOBASE
-                    } else {
+                    }
+                    else {
+                        //TODO : problem with oring is that opcode may already have contained n and i =1
+                        //like ending with 3 so if immediate  and n place already had1 it won:t change
+                        //so it isnot realistic in case of immediate or indirect code and will probably may produce wrong
+                        //object code
+                        //we can in "code: initialization up shift right by 2 then left by 6
+                        //It'llsolve the problem isA
                         switch (operand.charAt(0)) {
                             case '#': // immediate addressing
                                 code |= i;
@@ -326,18 +355,33 @@ public class Assembler {
                         int disp;
                         //if operand is not a label
                         if (symbolTable.get(operand) == null) {
+
                            disp = Integer.parseInt(operand);
-                        } else {
+
+                        }
+                        else {
                             int targetAddress = symbolTable.get(operand);
 
                             disp = targetAddress;
 
                             if (statement.isExtended() == false) {
                                 disp -= statement.location() + 3;
-
+                                //if pc relative
                                 if (disp >= -2048 && disp <= 2047) {
                                     code |= p;
-                                } else {
+                                }
+                                //else if out of base relative range
+                                else if ( baseAddress==0){
+                                    System.out.println("Base Address not set");
+                                }
+                                 if((targetAddress - baseAddress)>=4096 )
+                                {
+                                    System.out.println("Error at instrucion  "+statement.operation()+  "can't be base or pc relative");
+                                    //System.out.println("but object code handled as if base relative");
+
+                                }
+                                //else if base relative
+                                else {
                                     code |= b;
                                     disp = targetAddress - baseAddress;
                                 }
@@ -348,11 +392,12 @@ public class Assembler {
                             code |= e;
 
                             code = (code << 20) | (disp & 0xFFFFF);
-                        } else {
+                        }
+                        else {
                             code = (code << 12) | (disp & 0xFFF);
                         }
                     }
-
+                    //assign 8 or 6 hexa decimal digits
                     objCode = String.format(statement.isExtended() ? "%08X" : "%06X", code);
 
                     break;

@@ -92,6 +92,6 @@ WLOOP   TD     OUTPUT
         TIXR   T
         JLT    WLOOP
 OUTPUT  BYTE   X'05'
-VALUE1  RESW   1
-VALUE2  RESW   1
+VALUE1  RESW   5
+VALUE2  RESW   20
         END    FIRST
