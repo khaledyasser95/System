@@ -1,0 +1,48 @@
+This is an area to organize how we work
+
+SIC/XE Assembler
+
+Submission time: the week after midterms
+
+Inputs:
+1-A text file containing assembly language code (SIC/XE Assembly)
+
+Desired outputs:
+1-text file of symbol table: A table containing each label used in the program and the address it was
+declared /initialized in
+
+2-text file of Object code: a text file containing the binary code for each insnt+labels
+
+3-HTE record
+
+Notes:
+1-Instruction set can be initialized in the program or read from a text file
+2-4 instruction formats
+3-different addressing modes
+4-comments handling in reading
+5-unaccepted naming conventions like starting with name with an int
+6-ignoring case
+7-case of no label or no operand
+8-if extra space was added to alignment of program it should handle it
+
+
+//
+Suggested strategy:
+
+divide and conquer:
+a-making a program that reads the assembly text file and separates efficiently labels,instructions and operands
+and prints them out
+b-saving names of assembler directives in a data structure because they don't count and have no memory address
+
+
+pass 1 :
+
+pass2:
+
+
+checkpoints (tasks):
+1-reading and writing  properly in files
+2-saving instruction set in hash map (or a suitable data structure)
+
+
+TEST DRIVEN DEVELOPMENT: test case before coding
