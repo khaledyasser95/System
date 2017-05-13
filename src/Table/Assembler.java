@@ -22,6 +22,7 @@ public class Assembler {
     private int firstExecAddress;
     private int Length;
     private int baseAddress;
+    private final Map<String, Integer> Equ;
 
     public Assembler() {
         //Pointing the optable to the operation in the instruction class
@@ -29,17 +30,18 @@ public class Assembler {
         //Pointing the registertable to the register inside the instruction class
         registerTable = Instruc.getRegisterTable();
         symbolTable = new HashMap<>();
-        //Initializzing the symbol table
+        Equ = new HashMap<>();
+        //Initializing the symbol table
         symbolTable.put(null, 0);
-
+        Equ.put(null, 0);
 
     }
 
     public static void main(String args[]) {
         try {
-            Assembler asmb = new Assembler();
+            Assembler assembler = new Assembler();
             //  File assembly = new File ("copy.asm");
-            asmb.run(new File("input_fibonacci.txt"), new File("Listing.txt"), new File("symb.txt"), new File("HTMI.o"));
+            assembler.run(new File("input_fibonacci.txt"), new File("Listing.txt"), new File("symb.txt"), new File("HTMI.o"));
 
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
@@ -86,21 +88,28 @@ public class Assembler {
      */
 
     void pass1(File input, File output, File output2, File output3) throws IOException {
+
         try (Scanner scanner = new Scanner(input);
              FileOutputStream ostream = new FileOutputStream(output);
              FileOutputStream ostream3 = new FileOutputStream(output3);
              //OBJECT OUTPUT must get from a Serializable class
+             //OOS is for writing an object into a file
              ObjectOutputStream objOutputStream = new ObjectOutputStream(ostream3);
 
              FileOutputStream ostream2 = new FileOutputStream(output2);
              PrintWriter x = new PrintWriter(ostream);
              PrintWriter y = new PrintWriter(ostream2)
 
-        ) {
+        )//all past are parameters for this try block
+        //try block:
+        {
             location = startAddress = 0;
             firstExecAddress = -1;
+            y.println("LOCTR \t\t Label \t  Value");
+            //while not end of file
             while (scanner.hasNext()) {
-                try {
+                try {//try reading lines from file
+                    //read each line and parse it into a statement
                     Statement statement = Statement.parse(scanner.nextLine());
                     if (statement.isComment()) {
                         continue;
@@ -114,13 +123,22 @@ public class Assembler {
 
                         } else {
                             symbolTable.put(statement.label(), location);
-                            y.println(location + "\t" + statement.label());
+                            //made it print hexa:
+                            if (statement.operation().equals("EQU"))
+                                if (symbolTable.containsKey(statement.operand1()) || isNumeric(statement.operand1()))
+                                    Equ.put(statement.label(), Integer.parseInt(statement.operand1()));
+                                else throw new Forward(statement);
+                            y.println(Integer.toHexString(location).toUpperCase() + "\t" + statement.label());
+
                         }
                     }
                     //check operation
+                    boolean error = false;
                     switch (statement.operation()) {
-                        case "START":
-                            startAddress = Integer.parseInt(statement.operand1());
+
+                        case "START"://TODO : integer after start is hexa decimal not decimal
+                            //K made radix =16 because it is a hexa decimal number
+                            startAddress = Integer.parseInt(statement.operand1(), 16);
 
                             statement.setLocation(location = startAddress);
                             break;
@@ -142,10 +160,26 @@ public class Assembler {
 
                             break;
                         case "RESW":
-                            location += 3 * Integer.parseInt(statement.operand1());
 
+                            for (int i = 0; i < statement.operand1().length(); i++) {
+                                if (!Character.isLetterOrDigit(statement.operand1().charAt(i)))
+                                    System.out.println("can't use this symbol   " + statement.operand1().charAt(i) + "  in operation: " + statement.operand1());
+                                error = true;
+                            }
+                            if (!error)
+                                location += 3 * Integer.parseInt(statement.operand1());
+                            else
+                                location += 3;
                             break;
                         case "RESB":
+
+                            for (int i = 0; i < statement.operand1().length(); i++) {
+
+                                if (!Character.isLetterOrDigit(statement.operand1().charAt(i)))
+                                    System.out.println("can't use this symbol   " + statement.operand1().charAt(i) + "  in operation: " + statement.operand1());
+                                error = true;
+                            }
+
                             location += Integer.parseInt(statement.operand1());
 
                             break;
@@ -155,8 +189,12 @@ public class Assembler {
                             break;
                         case "BASE":
                             break;
+                        case "NOBASE":
+                            break;
+                        case "EQU":
+                            break;
 
-
+                        //not a directive
                         default:
                             if (opTable.containsKey(statement.operation())) {
                                 if (firstExecAddress < 0) {
@@ -181,7 +219,7 @@ public class Assembler {
                     }
                     x.println(statement);
                     objOutputStream.writeObject(statement);
-                } catch (Duplicate | WrongOperation e) {
+                } catch (Duplicate | WrongOperation | Forward e) {
                     x.println(e.getMessage());
                     y.println(e.getMessage());
                 }
@@ -190,7 +228,7 @@ public class Assembler {
             }
 
 
-        }
+        }//end try
     }
 
     /**
@@ -200,6 +238,8 @@ public class Assembler {
      * @throws ClassNotFoundException
      */
     void pass2(File input, File output) throws IOException, ClassNotFoundException {
+        //input file here is intermediate file which is listing file which is one that saves statement objects
+        //output file is the HTME file
         try (FileInputStream istream = new FileInputStream(input);
              ObjectInputStream objInputStream = new ObjectInputStream(istream);
              FileWriter objectProgram = new FileWriter(output)
@@ -218,12 +258,26 @@ public class Assembler {
                 if (statement.isComment()) {
                     continue;
                 }
-
+                //compare operation of statement object to "START"
                 if (statement.compareTo("START") == 0) {
 
                     objectProgram.write(new Header(statement.label(), startAddress, Length).toObjectProgram() + '\n');
                 } else if (statement.compareTo("END") == 0) {
                     break;
+                    /**
+                     * CONTROL SECTION
+                     */
+                } else if (statement.compareTo("EXTDEF") == 0) {
+                    //   objectProgram.write(new Define(statement.label(), startAddress, Length, statement.getSymb()).toObjectProgram() + '\n');
+
+                    break;
+                } else if (statement.compareTo("EXTREF") == 0) {
+                    //   objectProgram.write(new Define(statement.label(), startAddress, Length, statement.getSymb()).toObjectProgram() + '\n');
+
+                    break;
+                    /**
+                     *  END OF CONTROL SECTION
+                     */
                 } else {
                     String objectCode = Instruction(statement);
 
@@ -262,8 +316,8 @@ public class Assembler {
      */
     private String Instruction(Statement statement) {
         String objCode = "";
-
-        if (opTable.containsKey(statement.operation())) {
+        //if operation of statement is a valid operation
+        if (opTable.containsKey(statement.operation())) {//cases of format of operation
             switch (opTable.get(statement.operation()).getFormat()) {
                 case "1":
                     objCode = opTable.get(statement.operation()).getOpcode();
@@ -271,13 +325,13 @@ public class Assembler {
                     break;
                 case "2":
                     objCode = opTable.get(statement.operation()).getOpcode();
-
                     objCode += Integer.toHexString(registerTable.get(statement.operand1())).toUpperCase();
                     objCode += Integer.toHexString(registerTable.get(statement.operand2())).toUpperCase();
 
                     break;
+
                 case "3/4":
-                    final int n = 1 << 5;
+                    final int n = 1 << 5;// n=100000 in binary
                     final int i = 1 << 4;
                     final int x = 1 << 3;
                     final int b = 1 << 2;
@@ -287,10 +341,17 @@ public class Assembler {
                     // indicates that the number in the string should be parsed from a hexadecimal number to a decimal number.
                     int code = Integer.parseInt(opTable.get(statement.operation()).getOpcode(), 16) << 4;
                     String operand = statement.operand1();
-
+                    //if no operand
                     if (operand == null) {
+                        //put zeros in displacement
                         code = (code | n | i) << 12; // for RSUB, NOBASE
                     } else {
+                        //TODO : problem with oring is that opcode may already have contained n and i =1
+                        //like ending with 3 so if immediate  and n place already had1 it won:t change
+                        //so it isnot realistic in case of immediate or indirect code and will probably may produce wrong
+                        //object code
+                        //we can in "code: initialization up shift right by 2 then left by 6
+                        //It'llsolve the problem isA
                         switch (operand.charAt(0)) {
                             case '#': // immediate addressing
                                 code |= i;
@@ -312,9 +373,11 @@ public class Assembler {
                         }
 
                         int disp;
-
+                        //if operand is not a label
                         if (symbolTable.get(operand) == null) {
+
                             disp = Integer.parseInt(operand);
+
                         } else {
                             int targetAddress = symbolTable.get(operand);
 
@@ -322,12 +385,22 @@ public class Assembler {
 
                             if (statement.isExtended() == false) {
                                 disp -= statement.location() + 3;
-
+                                //if pc relative
                                 if (disp >= -2048 && disp <= 2047) {
                                     code |= p;
-                                } else {
-                                    code |= b;
+                                }
+                                //else if out of base relative range
+                                else if (baseAddress == 0) {
+                                    System.out.println("Base Address not set");
+                                }
+                                if ((targetAddress - baseAddress) >= 4096) {
+                                    System.out.println("Error at instrucion  " + statement.operation() + "can't be base or pc relative");
+                                    //System.out.println("but object code handled as if base relative");
 
+                                }
+                                //else if base relative
+                                else {
+                                    code |= b;
                                     disp = targetAddress - baseAddress;
                                 }
                             }
@@ -341,7 +414,7 @@ public class Assembler {
                             code = (code << 12) | (disp & 0xFFF);
                         }
                     }
-
+                    //assign 8 or 6 hexa decimal digits
                     objCode = String.format(statement.isExtended() ? "%08X" : "%06X", code);
 
                     break;
@@ -365,16 +438,27 @@ public class Assembler {
                     break;
             }
         } else if (statement.compareTo("WORD") == 0) {
-            objCode = String.format("%06X", statement.operand1());
+
+            //2nd change made it integer+parse int
+            objCode = String.format("%06X", Integer.parseInt(statement.operand1()));
         } else if (statement.compareTo("BASE") == 0) {
             baseAddress = symbolTable.get(statement.operand1());
         } else if (statement.compareTo("NOBASE") == 0) {
             baseAddress = 0;
+        } else if (statement.compareTo("EQU") == 0) {
+
         }
 
         return objCode;
     }
 
-
+    public static boolean isNumeric(String str) {
+        try {
+            Integer d = Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
 }
 

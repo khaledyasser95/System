@@ -1,18 +1,19 @@
+LOCTR 		 Label 	  Value
 0	FIBO
 0	FIRST
 Wrong operation : LDS
-11	LENGTH
-14	RDREC
-16	RLOOP
+B	LENGTH
+E	RDREC
+10	RLOOP
 Wrong operation : JGT
-38	INPUT
-39	WRREC
+26	INPUT
+27	WRREC
 Wrong operation : LDX
 Wrong operation : LDS
-45	WLOOP
+2D	WLOOP
 Wrong operation : ADDR
 Wrong operation : STS
 Wrong operation : LDS
-65	OUTPUT
-66	VALUE1
-69	VALUE2
+41	OUTPUT
+42	VALUE1
+45	VALUE2
