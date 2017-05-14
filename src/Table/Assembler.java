@@ -119,6 +119,9 @@ public class Assembler {
                         if (symbolTable.containsKey(statement.label())) {
                             throw new Duplicate(statement);
                         } else {
+                            /**
+                             * EQUATE IS HERE TO CHANGE IN SYMBOL TABLE
+                             */
                             if (statement.operation().equals("EQU")) {
                                 if (!isNumeric(statement.operand1()) && statement.operand1().charAt(0) != '*') {
                                     //getting address of the label from symbol table
@@ -134,18 +137,17 @@ public class Assembler {
                             } else symbolTable.put(statement.label(), location);
                             //made it print hexa:
                             if (statement.chracter == 'A') {
-                                String xx = String.format("%-10s  %s %s", statement.label(), statement.operand1(), statement.chracter);
+                                String xx = String.format("%-10s  %-10s %s", statement.label(), statement.operand1(), statement.chracter);
                                 y.println(xx);
-                                //y.println(statement.label() + "\t" + statement.operand1()+ "\t" +statement.chracter);
+
                             } else if (statement.operation().equals("EQU")) {
-                                String xx = String.format("%-10s  %s %s", statement.label(), Integer.toHexString(add).toUpperCase(), statement.chracter);
+                                String xx = String.format("%-10s  %-10s %s", statement.label(), Integer.toHexString(add).toUpperCase(), statement.chracter);
                                 y.println(xx);
 
                             } else {
-                                String xx = String.format("%-10s  %s %s", statement.label(), Integer.toHexString(location).toUpperCase(), statement.chracter);
+                                String xx = String.format("%-10s  %-10s %s", statement.label(), Integer.toHexString(location).toUpperCase(), statement.chracter);
                                 y.println(xx);
-                                // y.println(xx + "\t" + Integer.toHexString(location).toUpperCase() + "\t" + statement.chracter);
-                            }
+                                 }
                         }
                     }
                     //check operation

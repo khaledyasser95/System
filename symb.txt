@@ -1,14 +1,14 @@
-MAIN        1000 A
-LOOP        101D R
-GETPAIR     1028 R
-READ        #15 A
-GOBACK      1052  
-EOFCK       #33 A
-EXIT        1061 R
-HEX         1 A
-ADDR2       1 A
-ADDR3       1 A
-ORADDR      2 A
-RTADDR      4096 A
-ADDR1       1 A
-MAXLEN      4096 A
+MAIN        1000       A
+LOOP        101D       R
+GETPAIR     1028       R
+READ        #15        A
+GOBACK      1052        
+EOFCK       #33        A
+EXIT        1061       R
+HEX         1          A
+ADDR2       1          A
+ADDR3       1          A
+ORADDR      2          A
+RTADDR      4096       A
+ADDR1       1          A
+MAXLEN      4096       A

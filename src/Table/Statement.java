@@ -126,6 +126,7 @@ public class Statement implements Serializable, Comparable {
                 value=split[index];
                 //checking if there are 2 operands (if comma is found then 2 operands)
                 int pos = split[index].indexOf(',');
+
                 // POS>0==0 because if not found index return -1
                 if (pos >= 0) {
                     //Take from 0 to Pos-1 M,
@@ -139,21 +140,7 @@ public class Statement implements Serializable, Comparable {
                     }else  if (isNumeric(symbols[1]) || (symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#') ){
                         type[1]='A';
                     }else  type[0]=type[1]='R';
-                   /* if (!isNumeric(symbols[0]) && !isNumeric(symbols[1]) && symbols[0].charAt(0)!='@' && symbols[0].charAt(0)!='#'&& symbols[1].charAt(0)!='@' && symbols[1].charAt(0)!='#'){
-                        type[0]='R';
-                        type[1]='R';
-                    }
-                    else if (!isNumeric(symbols[0]) && (isNumeric(symbols[1])|| symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#')     ){
-                        type[0]='R';
-                        type[1]='A';
-                    }
-                    else if ((isNumeric(symbols[0])|| symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') && !isNumeric(symbols[1])){
-                        type[0]='A';
-                        type[1]='R';
-                    }else{
-                        type[0]='A';
-                        type[1]='A';
-                    }*/
+
                 } else {//else if only one operand
                     // COMPR T
                     symbols[0] = split[index];
@@ -253,3 +240,18 @@ public class Statement implements Serializable, Comparable {
         return Operation.compareTo((String) o);
     }
 }
+ /* if (!isNumeric(symbols[0]) && !isNumeric(symbols[1]) && symbols[0].charAt(0)!='@' && symbols[0].charAt(0)!='#'&& symbols[1].charAt(0)!='@' && symbols[1].charAt(0)!='#'){
+                        type[0]='R';
+                        type[1]='R';
+                    }
+                    else if (!isNumeric(symbols[0]) && (isNumeric(symbols[1])|| symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#')     ){
+                        type[0]='R';
+                        type[1]='A';
+                    }
+                    else if ((isNumeric(symbols[0])|| symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') && !isNumeric(symbols[1])){
+                        type[0]='A';
+                        type[1]='R';
+                    }else{
+                        type[0]='A';
+                        type[1]='A';
+                    }*/
