@@ -24,6 +24,7 @@ public class Assembler {
     private int Length;
     private int baseAddress;
     int add;
+
     public Assembler() {
         //Pointing the optable to the operation in the instruction class
         opTable = Instruc.getOPERATIONTable();
@@ -108,7 +109,7 @@ public class Assembler {
             while (scanner.hasNext()) {
                 try {//try reading lines from file
                     //read each line and parse it into a statement
-                    Statement statement = Statement.parse(scanner.nextLine(),location);
+                    Statement statement = Statement.parse(scanner.nextLine(), location);
                     if (statement.isComment()) {
                         continue;
                     }
@@ -123,28 +124,27 @@ public class Assembler {
                                     //getting address of the label from symbol table
                                     try {
                                         add = symbolTable.get(statement.operand1());
-                                    }catch (Exception F){
+                                    } catch (Exception F) {
                                         throw new Forward(statement);
                                     }
 
                                     symbolTable.put(statement.label(), add);
-                                }else if (statement.operand1().charAt(0) == '*')
-                                    add=location;
-                            }else symbolTable.put(statement.label(), location);
+                                } else if (statement.operand1().charAt(0) == '*')
+                                    add = location;
+                            } else symbolTable.put(statement.label(), location);
                             //made it print hexa:
-                            if (statement.chracter =='A'){
-                                 String xx= String.format("%-10s  %s %s",statement.label(),statement.operand1(),statement.chracter)  ;
-                              y.println(xx);
-                              //y.println(statement.label() + "\t" + statement.operand1()+ "\t" +statement.chracter);
-                            }else if (statement.operation().equals("EQU")){
-                                String xx= String.format("%-10s  %s %s",statement.label(),Integer.toHexString(add).toUpperCase(),statement.chracter)  ;
+                            if (statement.chracter == 'A') {
+                                String xx = String.format("%-10s  %s %s", statement.label(), statement.operand1(), statement.chracter);
+                                y.println(xx);
+                                //y.println(statement.label() + "\t" + statement.operand1()+ "\t" +statement.chracter);
+                            } else if (statement.operation().equals("EQU")) {
+                                String xx = String.format("%-10s  %s %s", statement.label(), Integer.toHexString(add).toUpperCase(), statement.chracter);
                                 y.println(xx);
 
-                            }
-                            else {
-                               String xx= String.format("%-10s  %s %s",statement.label(),Integer.toHexString(location).toUpperCase(),statement.chracter)  ;
-                                  y.println(xx);
-                               // y.println(xx + "\t" + Integer.toHexString(location).toUpperCase() + "\t" + statement.chracter);
+                            } else {
+                                String xx = String.format("%-10s  %s %s", statement.label(), Integer.toHexString(location).toUpperCase(), statement.chracter);
+                                y.println(xx);
+                                // y.println(xx + "\t" + Integer.toHexString(location).toUpperCase() + "\t" + statement.chracter);
                             }
                         }
                     }
@@ -213,17 +213,7 @@ public class Assembler {
                         case "NOBASE":
                             break;
                         case "EQU":
-                          /*  if (isNumeric(statement.operand1())) {
-                                old_loc = location;
-                            } else if (statement.operand1() == "*")
-                              location = location;*/
 
-                         /* if (!isNumeric(statement.operand1()) && statement.operand1().charAt(0)!='*'){
-                              //getting address of the label from symbol table
-                             int add= symbolTable.get(statement.operand1());
-                             location=add;
-                              statement.setLocation(location );
-                          }*/
                             break;
                         case "ORG":
 
@@ -354,8 +344,12 @@ public class Assembler {
                     break;
                 case "2":
                     objCode = opTable.get(statement.operation()).getOpcode();
-                    objCode += Integer.toHexString(registerTable.get(statement.operand1())).toUpperCase();
-                    objCode += Integer.toHexString(registerTable.get(statement.operand2())).toUpperCase();
+                    try {
+                        objCode += Integer.toHexString(registerTable.get(statement.operand1())).toUpperCase();
+                        objCode += Integer.toHexString(registerTable.get(statement.operand2())).toUpperCase();
+                    } catch (Exception x) {
+                        System.out.println("WRONG REGISTER "+x.getMessage());
+                    }
 
                     break;
 
@@ -402,64 +396,62 @@ public class Assembler {
                                 }
                         }
 
-                       try{
-                           int disp;
-                           //if operand is not a label
+                        try {
+                            int disp;
+                            //if operand is not a label
 
-                           if (symbolTable.get(operand) == null) {
+                            if (symbolTable.get(operand) == null) {
 
-                               disp = Integer.parseInt(operand);
+                                disp = Integer.parseInt(operand);
 
-                           } else {
-                               //GETS LOCATION OF THE OPERAND INSIDE SYMBOL TABLE IN DECIMAL
-                               int targetAddress = symbolTable.get(operand);
+                            } else {
+                                //GETS LOCATION OF THE OPERAND INSIDE SYMBOL TABLE IN DECIMAL
+                                int targetAddress = symbolTable.get(operand);
 
 
+                                disp = targetAddress;
 
-                               disp = targetAddress;
+                                if (statement.isExtended() == false) {
+                                    System.out.println(statement.location() + " HEY " + label);
+                                    disp -= statement.location() + 3;
+                                    //if pc relative
+                                    if (disp >= -2048 && disp <= 2047) {
+                                        code |= p;
+                                    }
+                                    //else if out of base relative range
+                                    else if (baseAddress == 0) {
+                                        System.out.println("Base Address not set");
+                                    }
+                                    if ((targetAddress - baseAddress) >= 4096) {
+                                        System.out.println("Error at instrucion  " + statement.operation() + "can't be base or pc relative");
+                                        //System.out.println("but object code handled as if base relative");
 
-                               if (statement.isExtended() == false) {
-                                   System.out.println(statement.location()+" HEY "+label);
-                                   disp -= statement.location() + 3;
-                                   //if pc relative
-                                   if (disp >= -2048 && disp <= 2047) {
-                                       code |= p;
-                                   }
-                                   //else if out of base relative range
-                                   else if (baseAddress == 0) {
-                                       System.out.println("Base Address not set");
-                                   }
-                                   if ((targetAddress - baseAddress) >= 4096) {
-                                       System.out.println("Error at instrucion  " + statement.operation() + "can't be base or pc relative");
-                                       //System.out.println("but object code handled as if base relative");
+                                    }
+                                    //else if base relative
+                                    else {
+                                        code |= b;
+                                        disp = targetAddress - baseAddress;
+                                    }
+                                }
+                            }
 
-                                   }
-                                   //else if base relative
-                                   else {
-                                       code |= b;
-                                       disp = targetAddress - baseAddress;
-                                   }
-                               }
-                           }
+                            if (statement.isExtended()) {
+                                code |= e;
 
-                           if (statement.isExtended()) {
-                               code |= e;
-
-                               code = (code << 20) | (disp & 0xFFFFF);
-                           } else {
-                               code = (code << 12) | (disp & 0xFFF);
-                           }
-                       }catch(Exception a) {
-                            System.out.println("ERROR FORWARD "+a.getMessage().toUpperCase());
-                       }
+                                code = (code << 20) | (disp & 0xFFFFF);
+                            } else {
+                                code = (code << 12) | (disp & 0xFFF);
+                            }
+                        } catch (Exception a) {
+                            System.out.println("ERROR FORWARD " + a.getMessage().toUpperCase());
+                        }
                     }
                     //assign 8 or 6 hexa decimal digits
                     objCode = String.format(statement.isExtended() ? "%08X" : "%06X", code);
 
                     break;
             }
-        }
-        else if (statement.compareTo("BYTE") == 0) {
+        } else if (statement.compareTo("BYTE") == 0) {
             String s = statement.operand1();
             char type = s.charAt(0);
 
