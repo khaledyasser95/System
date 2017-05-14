@@ -1,5 +1,5 @@
 MAIN     START  1000
-         BASE   ADDR1
+        BASE   ADDR1
          CLEAR  X
          JSUB   GETPAIR
          STCH   ADDR2
@@ -19,7 +19,7 @@ GETPAIR  STL    RTADDR
          STCH   HEX
          OR     ORADDR
          J      @RTADDR
-READ	 TD     #15
+READ	 TD     MAXLEN2
          JEQ    READ
          CLEAR  A
          RD     #15
@@ -29,6 +29,7 @@ READ	 TD     #15
          COMP   #10
          JLT    GOBACK
          SUB    #7
+         ORG    2000
 GOBACK   RSUB
 EOFCK    COMP   #33
          JEQ    EXIT
@@ -36,11 +37,13 @@ EOFCK    COMP   #33
          JGT    READ
 EXIT     CLEAR  L
          J      @ADDR1
-         END    MAIN
 HEX      RESB   1
+         END    MAIN
+MAXLEN   EQU    *
+MAXLEN2   EQU    2000
 ADDR2    RESB   1
 ADDR3    RESB   1
-ORADDR   REB    2
+ORADDR   RESB    2
 RTADDR   RESB   4096
 ADDR1    RESB   1
          END    MAIN

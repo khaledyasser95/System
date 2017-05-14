@@ -18,6 +18,7 @@ public class Assembler {
     //if we are going to do that then we need to put the constructor in pass 1
     private final Map<String, Integer> symbolTable;
     private int location;
+    private int old_loc;
     private int startAddress;
     private int firstExecAddress;
     private int Length;
@@ -99,15 +100,15 @@ public class Assembler {
              PrintWriter y = new PrintWriter(ostream2)
 
         )//all past are parameters for this try block
-                //try block:
+        //try block:
         {
-            location = startAddress = 0;
+            location = startAddress = old_loc = 0000;
             firstExecAddress = -1;
             //while not end of file
             while (scanner.hasNext()) {
                 try {//try reading lines from file
                     //read each line and parse it into a statement
-                    Statement statement = Statement.parse(scanner.nextLine());
+                    Statement statement = Statement.parse(scanner.nextLine(),location);
                     if (statement.isComment()) {
                         continue;
                     }
@@ -121,17 +122,24 @@ public class Assembler {
                         } else {
                             symbolTable.put(statement.label(), location);
                             //made it print hexa:
-                            y.println(Integer.toHexString(location).toUpperCase() + "\t" + statement.label());
-
+                            if (statement.chracter =='A'){
+                                 String xx= String.format("%-10s  %s %s",statement.label(),statement.operand1(),statement.chracter)  ;
+                              y.println(xx);
+                              //y.println(statement.label() + "\t" + statement.operand1()+ "\t" +statement.chracter);
+                            } else {
+                               String xx= String.format("%-10s  %s %s",statement.label(),Integer.toHexString(location).toUpperCase(),statement.chracter)  ;
+                                  y.println(xx);
+                               // y.println(xx + "\t" + Integer.toHexString(location).toUpperCase() + "\t" + statement.chracter);
+                            }
                         }
                     }
                     //check operation
-                    boolean error=false;
+                    boolean error = false;
                     switch (statement.operation()) {
 
                         case "START"://TODO : integer after start is hexa decimal not decimal
                             //K made radix =16 because it is a hexa decimal number
-                            startAddress = Integer.parseInt(statement.operand1(),16);
+                            startAddress = Integer.parseInt(statement.operand1(), 16);
 
                             statement.setLocation(location = startAddress);
                             break;
@@ -141,9 +149,11 @@ public class Assembler {
                             switch (s.charAt(0)) {
                                 case 'C':
                                     location += (s.length() - 3); // C'EOF' -> EOF -> 3 bytes
+
                                     break;
                                 case 'X':
                                     location += (s.length() - 3) / 2; // X'05' -> 05 -> 2 half bytes
+
                                     break;
                             }
                             break;
@@ -154,25 +164,26 @@ public class Assembler {
                             break;
                         case "RESW":
 
-                            for(int i=0;i<statement.operand1().length();i++)
-                            {
-                                if(!Character.isLetterOrDigit(statement.operand1().charAt(i)))
-                                    System.out.println("can't use this symbol   "+statement.operand1().charAt(i)+"  in operation: "+statement.operand1());
-                                error=true;
+                            for (int i = 0; i < statement.operand1().length(); i++) {
+                                if (!Character.isLetterOrDigit(statement.operand1().charAt(i)))
+                                    System.out.println("can't use this symbol   " + statement.operand1().charAt(i) + "  in operation: " + statement.operand1());
+                                error = true;
                             }
-                            if(!error)
-                            location += 3 * Integer.parseInt(statement.operand1());
-                            else
-                                location+=3;
+                            if (!error) {
+                                location += 3 * Integer.parseInt(statement.operand1());
+
+                            } else {
+                                location += 3;
+
+                            }
                             break;
                         case "RESB":
 
-                            for(int i=0;i<statement.operand1().length();i++)
-                            {
+                            for (int i = 0; i < statement.operand1().length(); i++) {
 
-                                if(!Character.isLetterOrDigit(statement.operand1().charAt(i)))
-                                    System.out.println("can't use this symbol   "+statement.operand1().charAt(i)+"  in operation: "+statement.operand1());
-                                error=true;
+                                if (!Character.isLetterOrDigit(statement.operand1().charAt(i)))
+                                    System.out.println("can't use this symbol   " + statement.operand1().charAt(i) + "  in operation: " + statement.operand1());
+                                error = true;
                             }
 
                             location += Integer.parseInt(statement.operand1());
@@ -185,6 +196,23 @@ public class Assembler {
                         case "BASE":
                             break;
                         case "NOBASE":
+                            break;
+                        case "EQU":
+                            if (isNumeric(statement.operand1())) {
+                                old_loc = location;
+
+                            } else if (statement.operand1() == "*")
+                              location = location;
+                            break;
+                        case "ORG":
+
+                            if (isNumeric(statement.operand1())) {
+                                old_loc = location;
+                                location = Integer.parseInt(statement.operand1(), 16);
+                                statement.setLocation(location);
+                            } else if (statement.operand1() == null) {
+                                location = old_loc;
+                            } else System.out.println("ERROR");
                             break;
 
                         //not a directive
@@ -263,6 +291,7 @@ public class Assembler {
                     // If it is format 4 and not immediate value
                     if (statement.isExtended() && symbolTable.containsKey(statement.operand1())) {
                         mRecords.add(new Modification(statement.location() + 1, 5));
+
                     }
 
 //                    Uncomment next line to show the instruction and corresponding object code
@@ -295,7 +324,7 @@ public class Assembler {
      */
     private String Instruction(Statement statement) {
         String objCode = "";
-            //if operation of statement is a valid operation
+        //if operation of statement is a valid operation
         if (opTable.containsKey(statement.operation())) {//cases of format of operation
             switch (opTable.get(statement.operation()).getFormat()) {
                 case "1":
@@ -320,12 +349,12 @@ public class Assembler {
                     // indicates that the number in the string should be parsed from a hexadecimal number to a decimal number.
                     int code = Integer.parseInt(opTable.get(statement.operation()).getOpcode(), 16) << 4;
                     String operand = statement.operand1();
+                    String label = statement.label();
                     //if no operand
                     if (operand == null) {
                         //put zeros in displacement
                         code = (code | n | i) << 12; // for RSUB, NOBASE
-                    }
-                    else {
+                    } else {
                         //TODO : problem with oring is that opcode may already have contained n and i =1
                         //like ending with 3 so if immediate  and n place already had1 it won:t change
                         //so it isnot realistic in case of immediate or indirect code and will probably may produce wrong
@@ -356,27 +385,29 @@ public class Assembler {
                         //if operand is not a label
                         if (symbolTable.get(operand) == null) {
 
-                           disp = Integer.parseInt(operand);
+                            disp = Integer.parseInt(operand);
 
-                        }
-                        else {
+                        } else {
+                            //GETS LOCATION OF THE OPERAND INSIDE SYMBOL TABLE IN DECIMAL
                             int targetAddress = symbolTable.get(operand);
+
+
 
                             disp = targetAddress;
 
                             if (statement.isExtended() == false) {
+                                System.out.println(statement.location()+"HEY "+label);
                                 disp -= statement.location() + 3;
                                 //if pc relative
                                 if (disp >= -2048 && disp <= 2047) {
                                     code |= p;
                                 }
                                 //else if out of base relative range
-                                else if ( baseAddress==0){
+                                else if (baseAddress == 0) {
                                     System.out.println("Base Address not set");
                                 }
-                                 if((targetAddress - baseAddress)>=4096 )
-                                {
-                                    System.out.println("Error at instrucion  "+statement.operation()+  "can't be base or pc relative");
+                                if ((targetAddress - baseAddress) >= 4096) {
+                                    System.out.println("Error at instrucion  " + statement.operation() + "can't be base or pc relative");
                                     //System.out.println("but object code handled as if base relative");
 
                                 }
@@ -392,8 +423,7 @@ public class Assembler {
                             code |= e;
 
                             code = (code << 20) | (disp & 0xFFFFF);
-                        }
-                        else {
+                        } else {
                             code = (code << 12) | (disp & 0xFFF);
                         }
                     }
@@ -402,7 +432,8 @@ public class Assembler {
 
                     break;
             }
-        } else if (statement.compareTo("BYTE") == 0) {
+        }
+        else if (statement.compareTo("BYTE") == 0) {
             String s = statement.operand1();
             char type = s.charAt(0);
 
@@ -433,6 +464,13 @@ public class Assembler {
         return objCode;
     }
 
-
+    public static boolean isNumeric(String str) {
+        try {
+            Integer d = Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
 }
 

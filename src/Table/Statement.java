@@ -23,8 +23,9 @@ public class Statement implements Serializable, Comparable {
     private final String[] Symbols;
     private final String _comment;
     private final boolean Extend;
-    private transient int _location;
-
+    private  int _location;
+    static char chracter;
+    static char chracter2;
     //constructor for a statement containing comments
     private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
@@ -40,6 +41,18 @@ public class Statement implements Serializable, Comparable {
         this(label, operation, extended, symbols, null);
     }
 
+    public Statement(String label, String operation, String[] symbols, String _comment, boolean extend, int _location) {
+        Label = label;
+        Operation = operation;
+        Symbols = symbols;
+        this._comment = _comment;
+        Extend = extend;
+        this._location = _location;
+    }
+    public Statement(String label, String operation, String[] symbols,  boolean extend, int _location) {
+        this(label, operation, symbols, null,extend ,_location);
+    }
+
     //why put . in operation not null?
     //constructor for a line containing only a comment
     public Statement(String comment) {
@@ -47,7 +60,7 @@ public class Statement implements Serializable, Comparable {
     }
 
     // method Split the Line LABEL OPCODE OPERAND
-    public static Statement parse(String statement) {
+    public static Statement parse(String statement,int _location) {
         // array of string statics each column contains a type: label,opcode,operand and comment (relatively)
         //trim ommits extra  spaces and split splits string into pieces every tab \t
         String[] split = statement.trim().split("\\s+");
@@ -65,7 +78,8 @@ public class Statement implements Serializable, Comparable {
         } else {
 
             // If not so it will be Statement to be fetched
-            String label, operation;
+            String label, operation,value;
+            char[] type;
             String[] symbols;
             boolean extended = false;
             int index = 0;
@@ -102,10 +116,14 @@ public class Statement implements Serializable, Comparable {
                 operation = operation.substring(1);
             }
             // OPERAND
+            type = new char[2];
+
             symbols = new String[2];
+            String x;
             // ADD M,X example
             //checking whether there are operands or not
             if (index < split.length) {
+                value=split[index];
                 //checking if there are 2 operands (if comma is found then 2 operands)
                 int pos = split[index].indexOf(',');
                 // POS>0==0 because if not found index return -1
@@ -113,17 +131,45 @@ public class Statement implements Serializable, Comparable {
                     //Take from 0 to Pos-1 M,
                     symbols[0] = split[index].substring(0, pos);
                     //Take from pos and next one ,X
+                    //gets the symbol, sign
+                     x=split[index].substring(pos, pos+1);
                     symbols[1] = split[index].substring(pos + 1);
+                    if (isNumeric(symbols[0]) || (symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') ){
+                        type[0]='A';
+                    }else  if (isNumeric(symbols[1]) || (symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#') ){
+                        type[1]='A';
+                    }else  type[0]=type[1]='R';
+                   /* if (!isNumeric(symbols[0]) && !isNumeric(symbols[1]) && symbols[0].charAt(0)!='@' && symbols[0].charAt(0)!='#'&& symbols[1].charAt(0)!='@' && symbols[1].charAt(0)!='#'){
+                        type[0]='R';
+                        type[1]='R';
+                    }
+                    else if (!isNumeric(symbols[0]) && (isNumeric(symbols[1])|| symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#')     ){
+                        type[0]='R';
+                        type[1]='A';
+                    }
+                    else if ((isNumeric(symbols[0])|| symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') && !isNumeric(symbols[1])){
+                        type[0]='A';
+                        type[1]='R';
+                    }else{
+                        type[0]='A';
+                        type[1]='A';
+                    }*/
                 } else {//else if only one operand
                     // COMPR T
                     symbols[0] = split[index];
                     symbols[1] = null;
+                    if (isNumeric(symbols[0]) || (symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') ){
+                        type[0]='A';
+                    }else  type[0]='R';
                 }
             } else {//else if index>=split.length which means no operands
                 symbols[0] = symbols[1] = null;
+                type[0]=type[1]=' ';
             }
-
-            return new Statement(label, operation, extended, symbols);
+            chracter=type[0];
+            chracter2=type[1];
+            return new Statement(label, operation, symbols, null,extended ,_location);
+            //return new Statement(label, operation, extended, symbols);
         }
     }
 
@@ -159,6 +205,14 @@ public class Statement implements Serializable, Comparable {
         return _location;
     }
 
+    public static boolean isNumeric(String str) {
+        try {
+            Integer d = Integer.parseInt(str);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+        return true;
+    }
     @Override
     //method to make the statement into a line again
     public String toString() {
