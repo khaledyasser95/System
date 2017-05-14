@@ -27,6 +27,7 @@ READ	 TD     MAXLEN2
          JLT    EOFCK
          SUB    #48
          COMP   #10
+MAXLEN7   EQU    *
          JLT    GOBACK
          SUB    #7
          ORG    2000
@@ -40,7 +41,9 @@ EXIT     CLEAR  L
 HEX      RESB   1
          END    MAIN
 MAXLEN   EQU    *
-MAXLEN2   EQU    2000
+MAXLEN2   EQU    READ
+MAXLEN3   EQU    *
+MAXLEN4   EQU    Khaled
 ADDR2    RESB   1
 ADDR3    RESB   1
 ORADDR   RESB    2

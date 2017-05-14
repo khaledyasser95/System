@@ -2,12 +2,15 @@ MAIN        1000 A
 LOOP        101D R
 GETPAIR     1028 R
 READ        1035 R
+MAXLEN7     104C R
 GOBACK      2000  
 EOFCK       #33 A
 EXIT        200F R
 HEX         1 A
 MAXLEN      2015 R
-MAXLEN2     2000 A
+MAXLEN2     1035 R
+MAXLEN3     2015 R
+Forward symbol found: Khaled
 ADDR2       1 A
 ADDR3       1 A
 ORADDR      2 A
