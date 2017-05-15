@@ -17,6 +17,7 @@ public class Assembler {
     //Q:is making symbol table final a correct move ? this means it can only be intialized in the constructor once
     //if we are going to do that then we need to put the constructor in pass 1
     private final Map<String, Integer> symbolTable;
+    private final Map<String, Character> type;
     private int location;
     private int old_loc;
     private int startAddress;
@@ -31,8 +32,10 @@ public class Assembler {
         //Pointing the registertable to the register inside the instruction class
         registerTable = Instruc.getRegisterTable();
         symbolTable = new HashMap<>();
+        type = new HashMap<>();
         //Initializing the symbol table
         symbolTable.put(null, 0);
+        type.put(null, null);
 
 
     }
@@ -123,7 +126,34 @@ public class Assembler {
                              * EQUATE IS HERE TO CHANGE IN SYMBOL TABLE
                              */
                             if (statement.operation().equals("EQU")) {
-                                if (!isNumeric(statement.operand1()) && statement.operand1().charAt(0) != '*') {
+                                if (statement.isExpression()) {
+                               /*     int inc=1;
+                                   for(int i=0;i<statement.size;i+=2){
+                                       //System.out.println(statement.symbout[i]);
+                                       char typ = type.get(statement.symbout[i]);
+                                       System.out.println(typ);
+                                       System.out.println(statement.symbout[inc]);
+                                       inc+=2;
+
+                                   }
+                                   if (statement.symbout[1].charAt(0)=='-'){
+                                       statement.chracter='A';
+                                       int value1 = symbolTable.get(statement.symbout[0]);
+                                       int value2 = symbolTable.get(statement.symbout[2]);
+                                       String result = String.valueOf(value1-value2);
+                                       statement.setoperand1(result);
+
+                                   }*/
+                                    System.out.println("EXPRESSION");
+                                    if (Expression(statement).equals("A")){
+                                        statement.chracter='A';
+                                       add=Integer.parseInt(statement.operand1());
+                                    }else if (Expression(statement).equals("A")){
+                                        statement.chracter='R';
+                                        add=Integer.parseInt(statement.operand1());
+                                    }else
+                                        throw new WrongOperation(statement);
+                                } else if (!isNumeric(statement.operand1()) && statement.operand1().charAt(0) != '*') {
                                     //getting address of the label from symbol table
                                     try {
                                         add = symbolTable.get(statement.operand1());
@@ -134,7 +164,10 @@ public class Assembler {
                                     symbolTable.put(statement.label(), add);
                                 } else if (statement.operand1().charAt(0) == '*')
                                     add = location;
-                            } else symbolTable.put(statement.label(), location);
+                                symbolTable.put(statement.label(), add);
+                            }
+                            else symbolTable.put(statement.label(), location);
+                            type.put(statement.label(), statement.chracter);
                             //made it print hexa:
                             if (statement.chracter == 'A') {
                                 String xx = String.format("%-10s  %-10s %s", statement.label(), statement.operand1(), statement.chracter);
@@ -147,7 +180,7 @@ public class Assembler {
                             } else {
                                 String xx = String.format("%-10s  %-10s %s", statement.label(), Integer.toHexString(location).toUpperCase(), statement.chracter);
                                 y.println(xx);
-                                 }
+                            }
                         }
                     }
                     //check operation
@@ -331,6 +364,132 @@ public class Assembler {
         }
     }
 
+    private String Expression(Statement statement) {
+        int evodd = statement.size - 1;
+        int inc = 0;
+        int val = 1;
+        char typ;
+        String sign;
+        String TYPE = "";
+        boolean even = false;
+        int  location1, location2 = 0;
+        int result=0;
+        int value1,value2=0;
+        if (evodd > 4)
+            even = false;
+        else
+            even = true;
+        //odd or even
+        if (evodd % 2 == 0) {
+            while (inc <= evodd && TYPE.length() != 3) {
+                String expol = "";
+                //GET+ABO+DO+SO
+
+                if (isNumeric(statement.symbout[inc])) {
+                    typ = 'A';
+                     value1 = symbolTable.get(statement.symbout[inc]);
+                } else {
+                    typ = type.get(statement.symbout[inc]);
+                     value1 = symbolTable.get(statement.symbout[inc]);
+
+                }
+                expol = String.valueOf(typ);
+                expol += statement.symbout[val];
+                sign = statement.symbout[val];
+                if (isNumeric(statement.symbout[inc + 2])) {
+                    typ = 'A';
+                     value2 = symbolTable.get(statement.symbout[inc + 2]);
+                } else {
+                    typ = type.get(statement.symbout[inc + 2]);
+                     value2 = symbolTable.get(statement.symbout[inc + 2]);
+                }
+                result+=value1-value2;
+                //System.out.println(inc+2);
+                expol += String.valueOf(typ);
+                TYPE += String.valueOf(checkexp(expol));
+                if (TYPE.length() - 1 == 2) {
+                    TYPE = String.valueOf(checkexp(expol));
+
+                } else if (even)
+                    break;
+                else
+                    TYPE += sign;
+                if (statement.size - 1 > 4)
+                    val += 2;
+                else
+                    val = 1;
+                //String result = String.valueOf(value1-value2);
+                // statement.setoperand1(result);
+                if (statement.size - 1 > 4)
+                    inc += 4;
+                else
+                    inc = 2;
+            }
+            System.out.println(TYPE+" VALUE: "+result);
+            statement.setoperand1(String.valueOf(result));
+            return TYPE;
+        } else {
+            //GET+ABO+DO
+            while (inc <= evodd && TYPE.length() != 3) {
+                String expol = "";
+                //GET+ABO+DO+SO
+                //int value1=symbolTable.get(statement.symbout[inc]);
+                //int value2= symbolTable.get(statement.symbout[inc+2]);
+                //
+
+                typ = type.get(statement.symbout[inc]);
+                expol = String.valueOf(typ);
+                expol += statement.symbout[val];
+                sign = statement.symbout[val];
+                typ = type.get(statement.symbout[inc + 2]);
+                System.out.println(inc + 2);
+                expol += String.valueOf(typ);
+                TYPE += String.valueOf(checkexp(expol));
+                if (TYPE.length() - 1 == 2) {
+                    TYPE = String.valueOf(checkexp(expol));
+
+                } else
+                    TYPE += sign;
+
+                val += 2;
+                //String result = String.valueOf(value1-value2);
+                // statement.setoperand1(result);
+                inc += 4;
+            }
+            System.out.println(TYPE); return TYPE;
+
+        }
+
+    }
+
+    private char checkexp(String expression) {
+        char c = ' ';
+        switch (expression) {
+            case ("R+R"):
+                c = 'x';
+                break;
+            case ("R-R"):
+                c = 'A';
+                break;
+            case ("A+A"):
+                c = 'A';
+                break;
+            case ("A-A"):
+                c = 'A';
+                break;
+            case ("R+A"):
+                c = 'R';
+                break;
+            case ("R-A"):
+                c = 'R';
+                break;
+            case ("A-R"):
+                c = 'x';
+                break;
+        }
+        return c;
+    }
+
     /**
      * @param statement
      * @return
@@ -350,7 +509,7 @@ public class Assembler {
                         objCode += Integer.toHexString(registerTable.get(statement.operand1())).toUpperCase();
                         objCode += Integer.toHexString(registerTable.get(statement.operand2())).toUpperCase();
                     } catch (Exception x) {
-                        System.out.println("WRONG REGISTER "+x.getMessage());
+                        System.out.println("WRONG REGISTER " + x.getMessage());
                     }
 
                     break;
@@ -414,7 +573,7 @@ public class Assembler {
                                 disp = targetAddress;
 
                                 if (statement.isExtended() == false) {
-                                    System.out.println(statement.location() + " HEY " + label);
+                                    //System.out.println(statement.location() + " HEY " + label);
                                     disp -= statement.location() + 3;
                                     //if pc relative
                                     if (disp >= -2048 && disp <= 2047) {

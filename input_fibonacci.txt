@@ -20,6 +20,7 @@ GETPAIR  STL    RTADDR
          OR     ORADDR
          J      @RTADDR
 READ	 TD     #15
+HEY      STCH   MAXLEN3
          JEQ    READ
          CLEAR  A
          RD     #15
@@ -37,13 +38,18 @@ EOFCK    COMP   #33
 EXIT     CLEAR  L
          J      @ADDR1
          END    MAIN
+MAXY     EQU    GETPAIR-GETPAIR-LOOP+GETPAIR
+MAXLEN   EQU    *
+MAXLEN2   EQU    *
+MAXLEN3  EQU    3000
+MAXLEN4  EQU    READ
 HEX      RESB   1
 ADDR2    RESB   1
 ADDR3    RESB   1
 ORADDR   RESB    2
-RTADDR   RESB   4096
+RTADDR   RESW   4096
 ADDR1    RESB   1
-MAXLEN   EQU   4096
+MAXLEN6   EQU   4096
          END    MAIN
 
 

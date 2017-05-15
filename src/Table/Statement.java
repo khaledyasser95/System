@@ -21,11 +21,14 @@ public class Statement implements Serializable, Comparable {
     private final String Label;
     private final String Operation;
     private final String[] Symbols;
+    static String [] symbout;
     private final String _comment;
     private final boolean Extend;
     private  int _location;
     static char chracter;
     static char chracter2;
+    private static boolean expression;
+    static int size;
     //constructor for a statement containing comments
     private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
@@ -82,6 +85,7 @@ public class Statement implements Serializable, Comparable {
             char[] type;
             String[] symbols;
             boolean extended = false;
+            expression=false;
             int index = 0;
             //Check if there is label
             //K: how did this check for a label  ? by comparing array length to 3 ?
@@ -99,12 +103,10 @@ public class Statement implements Serializable, Comparable {
             if(split.length==2)
             {
                 check=split[1];
-                if(check.equals("RSUB") )
-                    label=split[index++];
-            }
-
-
-
+                if(check.equals("RSUB") ) {
+                    label = split[index++];
+                chracter=chracter2='R';
+                }}
 
 
 
@@ -118,17 +120,41 @@ public class Statement implements Serializable, Comparable {
             // OPERAND
             type = new char[2];
 
-            symbols = new String[2];
+            symbols = new String[8];
+            String[] ExtD;
             String x;
+            int pos;
+            symbout = new String[8];
+
+
             // ADD M,X example
             //checking whether there are operands or not
             if (index < split.length) {
                 value=split[index];
-                //checking if there are 2 operands (if comma is found then 2 operands)
-                int pos = split[index].indexOf(',');
+                String[] t = value.split("(?=[-+*/()])|(?<=[^-+*/][-+*/])|(?<=[()])");
+              if (t.length>1){
+                  size=t.length;
+                  if (t[1]!=","){
+                      expression=true;
+                      for (int i=0;i<t.length;i++){
+                          symbout[i]= symbols[i]=t[i];
+
+                          System.out.println(symbols[i]);
+
+                      }
+
+                  }
+              }
+
+
+
+
+  //checking if there are 2 operands (if comma is found then 2 operands)
+                 pos = split[index].indexOf(',');
 
                 // POS>0==0 because if not found index return -1
                 if (pos >= 0) {
+                    expression=false;
                     //Take from 0 to Pos-1 M,
                     symbols[0] = split[index].substring(0, pos);
                     //Take from pos and next one ,X
@@ -145,8 +171,8 @@ public class Statement implements Serializable, Comparable {
                     // COMPR T
                     symbols[0] = split[index];
                     symbols[1] = null;
-                    if (isNumeric(symbols[0]) || (symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') ){
-                        type[0]='A';
+                    if ((isNumeric(symbols[0]) || symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') && (!operation.equals("RESW") && !operation.equals("RESB"))  ){
+                         type[0]='A';
                     }else  type[0]='R';
                 }
             } else {//else if index>=split.length which means no operands
@@ -160,6 +186,10 @@ public class Statement implements Serializable, Comparable {
         }
     }
 
+    public static boolean isExpression() {
+        return expression;
+    }
+
     public String label() {
         return Label;
     }
@@ -168,6 +198,9 @@ public class Statement implements Serializable, Comparable {
         return Operation;
     }
 
+    public void setoperand1(String x) {
+         Symbols[0]=x;
+    }
     public String operand1() {
         return Symbols[0];
     }
