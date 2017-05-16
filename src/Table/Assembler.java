@@ -18,6 +18,7 @@ public class Assembler {
     //if we are going to do that then we need to put the constructor in pass 1
     private final Map<String, Integer> symbolTable;
     private final Map<String, Character> type;
+    private final Map<String, String> repo;
     private int location;
     private int old_loc;
     private int startAddress;
@@ -33,10 +34,11 @@ public class Assembler {
         registerTable = Instruc.getRegisterTable();
         symbolTable = new HashMap<>();
         type = new HashMap<>();
+        repo = new HashMap<>();
         //Initializing the symbol table
         symbolTable.put(null, 0);
         type.put(null, ' ');
-
+        repo.put(null,null);
 
     }
 
@@ -126,34 +128,22 @@ public class Assembler {
                              * EQUATE IS HERE TO CHANGE IN SYMBOL TABLE
                              */
                             if (statement.operation().equals("EQU")) {
+                                String Lablval=repo.get(statement.label());
+
                                 if (statement.isExpression()) {
-                               /*     int inc=1;
-                                   for(int i=0;i<statement.size;i+=2){
-                                       //System.out.println(statement.symbout[i]);
-                                       char typ = type.get(statement.symbout[i]);
-                                       System.out.println(typ);
-                                       System.out.println(statement.symbout[inc]);
-                                       inc+=2;
 
-                                   }
-                                   if (statement.symbout[1].charAt(0)=='-'){
-                                       statement.chracter='A';
-                                       int value1 = symbolTable.get(statement.symbout[0]);
-                                       int value2 = symbolTable.get(statement.symbout[2]);
-                                       String result = String.valueOf(value1-value2);
-                                       statement.setoperand1(result);
-
-                                   }*/
                                     System.out.println("EXPRESSION");
                                     if (Expression(statement).equals("A")){
                                         statement.chracter='A';
                                        add=Integer.parseInt(statement.operand1());
                                         symbolTable.put(statement.label(), add);
+                                       // symbolTable.put(Lablval, add);
                                         type.put(statement.label(), statement.chracter);
                                     }else if (Expression(statement).equals("A")){
                                         statement.chracter='R';
                                         add=Integer.parseInt(statement.operand1());
                                         symbolTable.put(statement.label(), add);
+                                      //  symbolTable.put(Lablval, add);
                                         type.put(statement.label(), statement.chracter);
                                     }else
                                         throw new WrongOperation(statement);
@@ -164,17 +154,20 @@ public class Assembler {
                                     } catch (Exception F) {
                                         throw new Forward(statement);
                                     }
-
                                     symbolTable.put(statement.label(), add);
+                                    //symbolTable.put(Lablval, add);
                                     type.put(statement.label(), statement.chracter);
                                 } else if (statement.operand1().charAt(0) == '*')
                                     add = location;
                                 symbolTable.put(statement.label(), add);
+                              //  symbolTable.put(Lablval, add);
                                 type.put(statement.label(), statement.chracter);
                             }
                             else symbolTable.put(statement.label(), location);
+
                             type.put(statement.label(), statement.chracter);
                             //made it print hexa:
+                            repo.put(statement.label(),statement.operand1());
                             if (statement.chracter == 'A') {
                                 String xx = String.format("%-10s  %-10s %s", statement.label(), statement.operand1(), statement.chracter);
                                 y.println(xx);
@@ -254,7 +247,6 @@ public class Assembler {
                         case "NOBASE":
                             break;
                         case "EQU":
-
                             break;
                         case "ORG":
 
@@ -301,11 +293,12 @@ public class Assembler {
 
             }
             y.println("---------------------------------------------");
-            for (Map.Entry<String, Character> entry : type.entrySet()) {
-                String key = entry.getKey();
-                char value = entry.getValue();
 
-             //   System.out.println ("Key: " + key + " Value: " + value);
+            for (Map.Entry<String, Integer> entry : symbolTable.entrySet()) {
+                String key = entry.getKey();
+                int value = entry.getValue();
+            //    System.out.println ("Key: " + key + " Value: " + value);
+               // y.println(key +"    " + Integer.toHexString(value).toUpperCase());
             }
 
         }//end try
@@ -473,7 +466,7 @@ public class Assembler {
                 TYPE += statement.symbout[val+2];
                 TYPE += type.get(statement.symbout[inc + 4]);
                 if (TYPE.length() - 1 == 2) {
-                    TYPE = String.valueOf(checkexp(expol));
+                    TYPE = String.valueOf(checkexp(TYPE));
                 } else
                     TYPE += sign;
 
