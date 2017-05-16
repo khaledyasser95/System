@@ -165,6 +165,7 @@ public class Statement implements Serializable, Comparable {
                         type[0]='A';
                     }else  if (isNumeric(symbols[1]) || (symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#') ){
                         type[1]='A';
+
                     }else  type[0]=type[1]='R';
 
                 } else {//else if only one operand

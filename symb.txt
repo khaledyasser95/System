@@ -6,6 +6,7 @@ GOBACK      1052
 EOFCK       #33        A
 EXIT        1061       R
 HEX         1066       R
+Wrong operation : EQU
 ADDR2       1067       R
 ADDR3       1068       R
 ORADDR      1069       R

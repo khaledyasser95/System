@@ -23,7 +23,7 @@ public class Assembler {
     private int startAddress;
     private int firstExecAddress;
     private int Length;
-    private int baseAddress;
+    private int baseAddress=0;
     int add;
 
     public Assembler() {
@@ -305,7 +305,7 @@ public class Assembler {
                 String key = entry.getKey();
                 char value = entry.getValue();
 
-                System.out.println ("Key: " + key + " Value: " + value);
+             //   System.out.println ("Key: " + key + " Value: " + value);
             }
 
         }//end try
@@ -379,7 +379,16 @@ public class Assembler {
     }
 
     private String Expression(Statement statement) {
-        int evodd = statement.size - 1;
+        int evodd = statement.size-1 ;
+        int index=0;
+        int counter=1;
+        while(index!=evodd){
+        if(!statement.symbout[index].equals("-") && !statement.symbout[index].equals("+"))  {
+            counter++;
+            System.out.println("COUNTER : "+counter);
+        }
+            index++;
+        }
         int inc = 0;
         int val = 1;
         char typ;
@@ -394,11 +403,10 @@ public class Assembler {
         else
             even = true;
         //odd or even
-        if (evodd % 2 == 0) {
+        if (counter % 2 == 0) {
             while (inc <= evodd && TYPE.length() != 3) {
                 String expol = "";
                 //GET+ABO+DO+SO
-
                 if (isNumeric(statement.symbout[inc])) {
                     typ = 'A';
                      value1 = symbolTable.get(statement.symbout[inc]);
@@ -417,7 +425,11 @@ public class Assembler {
                     typ = type.get(statement.symbout[inc + 2]);
                      value2 = symbolTable.get(statement.symbout[inc + 2]);
                 }
-                result+=value1-value2;
+                if (sign.equals("-")){
+                    result+=value1-value2;
+                }else if ( sign.equals("+")){
+                    result+=value1+value2;
+                }
                 //System.out.println(inc+2);
                 expol += String.valueOf(typ);
                 TYPE += String.valueOf(checkexp(expol));
@@ -444,13 +456,12 @@ public class Assembler {
             return TYPE;
         } else {
             //GET+ABO+DO
-            while (inc <= evodd && TYPE.length() != 3) {
+            while (inc <= counter && TYPE.length() != 3) {
                 String expol = "";
                 //GET+ABO+DO+SO
                 //int value1=symbolTable.get(statement.symbout[inc]);
                 //int value2= symbolTable.get(statement.symbout[inc+2]);
                 //
-
                 typ = type.get(statement.symbout[inc]);
                 expol = String.valueOf(typ);
                 expol += statement.symbout[val];
@@ -459,9 +470,10 @@ public class Assembler {
                 System.out.println(inc + 2);
                 expol += String.valueOf(typ);
                 TYPE += String.valueOf(checkexp(expol));
+                TYPE += statement.symbout[val+2];
+                TYPE += type.get(statement.symbout[inc + 4]);
                 if (TYPE.length() - 1 == 2) {
                     TYPE = String.valueOf(checkexp(expol));
-
                 } else
                     TYPE += sign;
 
@@ -470,7 +482,7 @@ public class Assembler {
                 // statement.setoperand1(result);
                 inc += 4;
             }
-            System.out.println(TYPE); return TYPE;
+            System.out.println("TYPE "+TYPE); return TYPE;
 
         }
 
@@ -622,7 +634,7 @@ public class Assembler {
                         }
                     }
                     //assign 8 or 6 hexa decimal digits
-                    objCode = String.format(statement.isExtended() ? "%08X" : "%06X", code);
+                    objCode = String.format(statement.isExtended() ? "^%08X" : "^%06X", code);
 
                     break;
             }
@@ -647,7 +659,7 @@ public class Assembler {
         } else if (statement.compareTo("WORD") == 0) {
 
             //2nd change made it integer+parse int
-            objCode = String.format("%06X", Integer.parseInt(statement.operand1()));
+            objCode = String.format("^%06X", Integer.parseInt(statement.operand1()));
         } else if (statement.compareTo("BASE") == 0) {
             baseAddress = symbolTable.get(statement.operand1());
         } else if (statement.compareTo("NOBASE") == 0) {

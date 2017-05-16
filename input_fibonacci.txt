@@ -38,6 +38,7 @@ EXIT     CLEAR  L
          J      @ADDR1
          END    MAIN
 HEX      RESB   1
+MAXLEN   EQU    GETPAIR-READ+GETPAIR
 ADDR2    RESB   1
 ADDR3    RESB   1
 ORADDR   RESB    2
