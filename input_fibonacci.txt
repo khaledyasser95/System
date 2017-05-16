@@ -1,7 +1,6 @@
 MAIN     START  1000
-         EXTDEF LOOP,GETPAIR,READ
-         EXTREF RDREC,WRREC
-         CLEAR  A
+         BASE   ADDR1
+         CLEAR  X
          JSUB   GETPAIR
          STCH   ADDR2
          JSUB   GETPAIR
@@ -12,18 +11,15 @@ MAIN     START  1000
          JSUB   GETPAIR
          STCH   ADDR2
 LOOP     JSUB   GETPAIR
-         STCH   ADDR1,X
+        STCH   ADDR1,X
          TIXR   X
          J      LOOP
 GETPAIR  STL    RTADDR
          JSUB   READ
-         JSUB   RDREC
-         JSUB   WRREC
          STCH   HEX
          OR     ORADDR
          J      @RTADDR
 READ	 TD     #15
-HEY      STCH   MAXLEN3
          JEQ    READ
          CLEAR  A
          RD     #15
@@ -41,29 +37,13 @@ EOFCK    COMP   #33
 EXIT     CLEAR  L
          J      @ADDR1
          END    MAIN
-MAXY     EQU    GETPAIR-GETPAIR-LOOP+GETPAIR
-MAXLEN   EQU    *
-MAXLEN2   EQU    *
-MAXLEN3  EQU    3000
-MAXLEN4  EQU    READ
 HEX      RESB   1
 ADDR2    RESB   1
 ADDR3    RESB   1
 ORADDR   RESB    2
-RTADDR   RESW   4096
+RTADDR   RESB   4096
 ADDR1    RESB   1
-MAXLEN6   EQU   4096
-KAREEM   CSECT
-         EXTREF LOOP,GETPAIR,READ
-         EXTDEF RDREC,WRREC
-RDREC  EQU    3000
-WRREC  EQU    3000
-JSUB   GETPAIR
-+JSUB   LOOP
-JSUB   ERROR
-JSUB   MAXLEN6
+MAXLEN   EQU   4096
          END    MAIN
-         JSUB   ERROR
-         JSUB   MAXLEN6
 
 
