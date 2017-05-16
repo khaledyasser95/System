@@ -1,5 +1,8 @@
 MAIN     START  1000
          BASE   ADDR1
+KAREEM   CSECT
+         EXTDEF LOOP,GETPAIR,READ
+         EXTREF RDREC,WRREC
          CLEAR  A
          JSUB   GETPAIR
          STCH   ADDR2
@@ -11,11 +14,13 @@ MAIN     START  1000
          JSUB   GETPAIR
          STCH   ADDR2
 LOOP     JSUB   GETPAIR
-        STCH   ADDR1,X
+         STCH   ADDR1,X
          TIXR   X
          J      LOOP
 GETPAIR  STL    RTADDR
          JSUB   READ
+         JSUB   RDREC
+         JSUB   WRREC
          STCH   HEX
          OR     ORADDR
          J      @RTADDR

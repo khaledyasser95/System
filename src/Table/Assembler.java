@@ -16,14 +16,16 @@ public class Assembler {
     private final Map<String, Integer> registerTable;
     //Q:is making symbol table final a correct move ? this means it can only be intialized in the constructor once
     //if we are going to do that then we need to put the constructor in pass 1
-    private final Map<String, Integer> symbolTable;
+    //private final Map<String, Integer> symbolTable;
     private final Map<String, Character> type;
+    ArrayList<ControlSection> controlSections;
     private int location;
     private int old_loc;
     private int startAddress;
     private int firstExecAddress;
     private int Length;
     private int baseAddress;
+    ControlSection currentCS;
     int add;
 
     public Assembler() {
@@ -31,12 +33,14 @@ public class Assembler {
         opTable = Instruc.getOPERATIONTable();
         //Pointing the registertable to the register inside the instruction class
         registerTable = Instruc.getRegisterTable();
-        symbolTable = new HashMap<>();
+        //symbolTable = new HashMap<>();
         type = new HashMap<>();
         //Initializing the symbol table
-        symbolTable.put(null, 0);
+       // symbolTable.put(null, 0);
         type.put(null, null);
-
+        currentCS=new ControlSection();
+        controlSections=new ArrayList<>(5);
+        controlSections.add(currentCS);
 
     }
 
@@ -119,7 +123,8 @@ public class Assembler {
                     statement.setLocation(location);
                     //check Duplication of label
                     if (statement.label() != null) {
-                        if (symbolTable.containsKey(statement.label())) {
+
+                        if (currentCS.symbolTable.containsKey(statement.label())) {
                             throw new Duplicate(statement);
                         } else {
                             /**
@@ -156,17 +161,17 @@ public class Assembler {
                                 } else if (!isNumeric(statement.operand1()) && statement.operand1().charAt(0) != '*') {
                                     //getting address of the label from symbol table
                                     try {
-                                        add = symbolTable.get(statement.operand1());
+                                        add = currentCS.symbolTable.get(statement.operand1());
                                     } catch (Exception F) {
                                         throw new Forward(statement);
                                     }
 
-                                    symbolTable.put(statement.label(), add);
+                                    currentCS.symbolTable.put(statement.label(), add);
                                 } else if (statement.operand1().charAt(0) == '*')
                                     add = location;
-                                symbolTable.put(statement.label(), add);
+                                currentCS.symbolTable.put(statement.label(), add);
                             }
-                            else symbolTable.put(statement.label(), location);
+                            else currentCS.symbolTable.put(statement.label(), location);
                             type.put(statement.label(), statement.chracter);
                             //made it print hexa:
                             if (statement.chracter == 'A') {
@@ -190,7 +195,7 @@ public class Assembler {
                         case "START"://TODO : integer after start is hexa decimal not decimal
                             //K made radix =16 because it is a hexa decimal number
                             startAddress = Integer.parseInt(statement.operand1(), 16);
-
+                            currentCS.setName(statement.label());
                             statement.setLocation(location = startAddress);
                             break;
                         case "BYTE":
@@ -243,6 +248,58 @@ public class Assembler {
 
                         case "END":
                             break;
+
+
+
+
+                        case "CSECT":
+                            location=0;
+                            statement.setLocation(location);
+                            currentCS=new ControlSection(statement.label());
+                            controlSections.add(currentCS);
+                            break;
+                        case "EXTDEF":
+
+                            //statement.setLocation(location);
+
+                            for (int i = 0; i <8; i++)
+                            {
+                                if (statement.Symbols[i] !="kiko"&&statement.Symbols[i] !=null)
+                                {
+                                    currentCS.externallyDefined.add(statement.Symbols[i]);
+                                }
+                            }
+
+
+                            break;
+                        case "EXTREF":
+
+                            //statement.setLocation(location);
+                            //TODO: check if they are externally defined in a control section befor adding them to symtab
+                            for (int i = 2; i <8; i++)
+                            {
+                                String operand=statement.Symbols[i];
+                                ControlSection cs=null;
+                                //loop all control sections to check if each label beside extrefrence
+                                //is externally defined in a control section
+                                //if so add it to symbol tabel of control section
+                                for (int j = 0; j < controlSections.size(); j++) {
+
+                                    cs=controlSections.get(j);
+
+                                    if (cs.searchExtDef(operand)!=null&&operand !="kiko"&&operand !=null)
+                                    {
+                                        //give it value zero as address
+                                        currentCS.symbolTable.put(operand,0);
+                                    }
+                                }
+
+
+                            }
+                            break;
+
+
+
                         case "BASE":
                             break;
                         case "NOBASE":
@@ -319,23 +376,31 @@ public class Assembler {
             TEXT textRecord = new TEXT(startAddress);
             int lastRecordAddress = startAddress;
 
-            while (istream.available() > 0) {
+
+            while (istream.available() > 0)
+            {
                 Statement statement = (Statement) objInputStream.readObject();
 
-                if (statement.isComment()) {
+                if (statement.isComment())
+                {
                     continue;
                 }
                 //compare operation of statement object to "START"
-                if (statement.compareTo("START") == 0) {
+                if (statement.compareTo("START") == 0)
+                {
 
                     objectProgram.write(new Header(statement.label(), startAddress, Length).toObjectProgram() + '\n');
-                } else if (statement.compareTo("END") == 0) {
+                }
+                else if (statement.compareTo("END") == 0)
+                {
                     break;
-                } else {
+                }
+                else
+                    {
                     String objectCode = Instruction(statement);
 
                     // If it is format 4 and not immediate value
-                    if (statement.isExtended() && symbolTable.containsKey(statement.operand1())) {
+                    if (statement.isExtended() && currentCS.symbolTable.containsKey(statement.operand1())) {
                         mRecords.add(new Modification(statement.location() + 1, 5));
 
                     }
@@ -387,10 +452,10 @@ public class Assembler {
 
                 if (isNumeric(statement.symbout[inc])) {
                     typ = 'A';
-                     value1 = symbolTable.get(statement.symbout[inc]);
+                     value1 = currentCS.symbolTable.get(statement.symbout[inc]);
                 } else {
                     typ = type.get(statement.symbout[inc]);
-                     value1 = symbolTable.get(statement.symbout[inc]);
+                     value1 = currentCS.symbolTable.get(statement.symbout[inc]);
 
                 }
                 expol = String.valueOf(typ);
@@ -398,10 +463,10 @@ public class Assembler {
                 sign = statement.symbout[val];
                 if (isNumeric(statement.symbout[inc + 2])) {
                     typ = 'A';
-                     value2 = symbolTable.get(statement.symbout[inc + 2]);
+                     value2 = currentCS.symbolTable.get(statement.symbout[inc + 2]);
                 } else {
                     typ = type.get(statement.symbout[inc + 2]);
-                     value2 = symbolTable.get(statement.symbout[inc + 2]);
+                     value2 = currentCS.symbolTable.get(statement.symbout[inc + 2]);
                 }
                 result+=value1-value2;
                 //System.out.println(inc+2);
@@ -561,13 +626,14 @@ public class Assembler {
                             int disp;
                             //if operand is not a label
 
-                            if (symbolTable.get(operand) == null) {
+                            if (currentCS.symbolTable.get(operand) == null) {
 
+                                //number
                                 disp = Integer.parseInt(operand);
 
                             } else {
                                 //GETS LOCATION OF THE OPERAND INSIDE SYMBOL TABLE IN DECIMAL
-                                int targetAddress = symbolTable.get(operand);
+                                int targetAddress = currentCS.symbolTable.get(operand);
 
 
                                 disp = targetAddress;
@@ -635,7 +701,7 @@ public class Assembler {
             //2nd change made it integer+parse int
             objCode = String.format("%06X", Integer.parseInt(statement.operand1()));
         } else if (statement.compareTo("BASE") == 0) {
-            baseAddress = symbolTable.get(statement.operand1());
+            baseAddress = currentCS.symbolTable.get(statement.operand1());
         } else if (statement.compareTo("NOBASE") == 0) {
             baseAddress = 0;
         }

@@ -20,7 +20,7 @@ resource: https://www.tutorialspoint.com/java/java_serialization.htm
 public class Statement implements Serializable, Comparable {
     private final String Label;
     private final String Operation;
-    private final String[] Symbols;
+    public  String[] Symbols;
     static String [] symbout;
     private final String _comment;
     private final boolean Extend;
@@ -103,7 +103,7 @@ public class Statement implements Serializable, Comparable {
             if(split.length==2)
             {
                 check=split[1];
-                if(check.equals("RSUB") ) {
+                if(check.equals("RSUB")||check.equals("CSECT") ) {
                     label = split[index++];
                 chracter=chracter2='R';
                 }}
@@ -159,8 +159,31 @@ public class Statement implements Serializable, Comparable {
                     symbols[0] = split[index].substring(0, pos);
                     //Take from pos and next one ,X
                     //gets the symbol, sign
+
+                    //no it gets the comma if multiple operands
                      x=split[index].substring(pos, pos+1);
+
+                     //what if 3 labels this means symbols[1] will take 2 separated by comma todo
                     symbols[1] = split[index].substring(pos + 1);
+
+
+                    //this part is for checkuing if there are more than 2 operands
+                    int k=1;
+                    String manyOperands=symbols[k];
+                    pos=manyOperands.indexOf(',');
+                    while(pos>0)
+                    {
+                        System.out.println(pos);
+                        symbols[k]=manyOperands.substring(0,pos);
+                        manyOperands=manyOperands.substring(pos+1);
+                        k++;
+                        pos=manyOperands.indexOf(',');
+                    }
+                    symbols[k+1]="kiko";
+
+
+
+
                     if (isNumeric(symbols[0]) || (symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') ){
                         type[0]='A';
                     }else  if (isNumeric(symbols[1]) || (symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#') ){
