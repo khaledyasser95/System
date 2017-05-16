@@ -2,19 +2,14 @@ MAIN        1000       A
 LOOP        101D       R
 GETPAIR     1028       R
 READ        #15        A
-HEY         1038       R
-GOBACK      1055        
+GOBACK      1052        
 EOFCK       #33        A
-EXIT        1064       R
-MAXY        -11        A
-MAXLEN      1069       R
-MAXLEN2     1069       R
-MAXLEN3     3000       A
-MAXLEN4     1035       R
-HEX         1069       R
-ADDR2       106A       R
-ADDR3       106B       R
-ORADDR      106C       R
-RTADDR      106E       R
-ADDR1       1071       R
-MAXLEN6     4096       A
+EXIT        1061       R
+HEX         1066       R
+ADDR2       1067       R
+ADDR3       1068       R
+ORADDR      1069       R
+RTADDR      106B       R
+ADDR1       206B       R
+MAXLEN      4096       A
+---------------------------------------------

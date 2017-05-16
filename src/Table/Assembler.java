@@ -35,7 +35,7 @@ public class Assembler {
         type = new HashMap<>();
         //Initializing the symbol table
         symbolTable.put(null, 0);
-        type.put(null, null);
+        type.put(null, ' ');
 
 
     }
@@ -148,9 +148,13 @@ public class Assembler {
                                     if (Expression(statement).equals("A")){
                                         statement.chracter='A';
                                        add=Integer.parseInt(statement.operand1());
+                                        symbolTable.put(statement.label(), add);
+                                        type.put(statement.label(), statement.chracter);
                                     }else if (Expression(statement).equals("A")){
                                         statement.chracter='R';
                                         add=Integer.parseInt(statement.operand1());
+                                        symbolTable.put(statement.label(), add);
+                                        type.put(statement.label(), statement.chracter);
                                     }else
                                         throw new WrongOperation(statement);
                                 } else if (!isNumeric(statement.operand1()) && statement.operand1().charAt(0) != '*') {
@@ -162,9 +166,11 @@ public class Assembler {
                                     }
 
                                     symbolTable.put(statement.label(), add);
+                                    type.put(statement.label(), statement.chracter);
                                 } else if (statement.operand1().charAt(0) == '*')
                                     add = location;
                                 symbolTable.put(statement.label(), add);
+                                type.put(statement.label(), statement.chracter);
                             }
                             else symbolTable.put(statement.label(), location);
                             type.put(statement.label(), statement.chracter);
@@ -284,6 +290,7 @@ public class Assembler {
                                 throw new WrongOperation(statement);
                             }
                     }
+
                     x.println(statement);
                     objOutputStream.writeObject(statement);
                 } catch (Duplicate | WrongOperation | Forward e) {
@@ -293,7 +300,13 @@ public class Assembler {
                 Length = location - startAddress;
 
             }
+            y.println("---------------------------------------------");
+            for (Map.Entry<String, Character> entry : type.entrySet()) {
+                String key = entry.getKey();
+                char value = entry.getValue();
 
+                System.out.println ("Key: " + key + " Value: " + value);
+            }
 
         }//end try
     }
@@ -321,6 +334,7 @@ public class Assembler {
 
             while (istream.available() > 0) {
                 Statement statement = (Statement) objInputStream.readObject();
+
 
                 if (statement.isComment()) {
                     continue;
