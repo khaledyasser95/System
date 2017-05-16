@@ -14,7 +14,7 @@ LOOP     JSUB   GETPAIR
         STCH   ADDR1,X
          TIXR   X
          J      LOOP
-GETPAIR  STL    RTADDR
+GETPAIR  STL    MAXLEN1
          JSUB   READ
          STCH   HEX
          OR     ORADDR
@@ -38,7 +38,7 @@ EXIT     CLEAR  L
          J      @ADDR1
          END    MAIN
 HEX      RESB   1
-MAXLEN   EQU    GETPAIR-READ+GETPAIR
+MAXLEN1  EQU    5000
 ADDR2    RESB   1
 ADDR3    RESB   1
 ORADDR   RESB    2
