@@ -427,7 +427,7 @@ public class Assembler {
                 expol += String.valueOf(typ);
                 TYPE += String.valueOf(checkexp(expol));
                 if (TYPE.length() - 1 == 2) {
-                    TYPE = String.valueOf(checkexp(expol));
+                    TYPE = String.valueOf(checkexp(TYPE));
 
                 } else if (even)
                     break;
