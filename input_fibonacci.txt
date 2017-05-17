@@ -19,7 +19,7 @@ GETPAIR  STL    MAXLEN1
          STCH   HEX
          OR     ORADDR
          J      @RTADDR
-READ	 TD     #15
+READ	 TD     MAXLEN1
          JEQ    READ
          CLEAR  A
          RD     #15
@@ -39,6 +39,8 @@ EXIT     CLEAR  L
          END    MAIN
 HEX      RESB   1
 MAXLEN1  EQU    5000
+MAXLEN2  EQU    *
+MAXLEN4  EQU    GETPAIR+READ-GETPAIR
 ADDR2    RESB   1
 ADDR3    RESB   1
 ORADDR   RESB    2
