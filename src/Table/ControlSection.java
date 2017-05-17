@@ -1,5 +1,6 @@
 package Table;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -7,7 +8,7 @@ import java.util.Map;
 /**
  * Created by Kareem on 16-May-17.
  */
-public class ControlSection {
+public class ControlSection implements Serializable {
     String name;
     ArrayList<String> externallyDefined;
    // ArrayList<String> externalReference;

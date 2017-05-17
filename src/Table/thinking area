@@ -1,3 +1,10 @@
+// current situation may 17th is that the progam does pass 2 according to latest control section and not for each CS
+//what if I repeated pass 2 each time it saw a new CS ?
+//either that or edit code of pass 2 to repeat itself and write all records for each control section
+//we will have to edit file writers to assert on current files and not rewrite them except for first timr
+//i.e when it sees "START"
+
+
 what we want to do :
 1-add EQU and ORG as valid operations
 2-make symbol accept expressions
@@ -5,6 +12,9 @@ what we want to do :
 4-error if forward reference in symbol
 5-handel illegal expressions
 6-bonus handel *
+
+
+
 +control sections
 
 

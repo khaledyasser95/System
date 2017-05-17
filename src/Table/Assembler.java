@@ -22,6 +22,7 @@ public class Assembler {
     private int location;
     private int old_loc;
     private int startAddress;
+    private int CSstartAddress;
     private int firstExecAddress;
     private int Length;
     private int baseAddress;
@@ -75,6 +76,7 @@ public class Assembler {
 
             pass2(intermediateFile, output3);
         } finally {
+            //exception here in this line null pointer exception
             intermediateFile.delete();
         }
     }
@@ -110,13 +112,18 @@ public class Assembler {
         )//all past are parameters for this try block
         //try block:
         {
-            location = startAddress = old_loc = 0000;
+            CSstartAddress= location = startAddress = old_loc = 0000;
             firstExecAddress = -1;
             //while not end of file
             while (scanner.hasNext()) {
                 try {//try reading lines from file
                     //read each line and parse it into a statement
                     Statement statement = Statement.parse(scanner.nextLine(), location);
+
+
+                    statement.setCS(currentCS);
+
+
                     if (statement.isComment()) {
                         continue;
                     }
@@ -194,7 +201,7 @@ public class Assembler {
 
                         case "START"://TODO : integer after start is hexa decimal not decimal
                             //K made radix =16 because it is a hexa decimal number
-                            startAddress = Integer.parseInt(statement.operand1(), 16);
+                           CSstartAddress= startAddress = Integer.parseInt(statement.operand1(), 16);
                             currentCS.setName(statement.label());
                             statement.setLocation(location = startAddress);
                             break;
@@ -253,8 +260,14 @@ public class Assembler {
 
 
                         case "CSECT":
-                            location=0;
+                            //control section names are concidered as external symbols
+                            currentCS.externallyDefined.add(statement.label());
+                            //set location of new control section to zero
+
+                            CSstartAddress= location=0;
+                            firstExecAddress=-1;
                             statement.setLocation(location);
+                            //make a new control section with the name as the label
                             currentCS=new ControlSection(statement.label());
                             controlSections.add(currentCS);
                             break;
@@ -321,6 +334,7 @@ public class Assembler {
                         //not a directive
                         default:
                             if (opTable.containsKey(statement.operation())) {
+                                //if first Executable address is not set yet , set it
                                 if (firstExecAddress < 0) {
                                     firstExecAddress = location;
                                 }
@@ -347,7 +361,7 @@ public class Assembler {
                     x.println(e.getMessage());
                     y.println(e.getMessage());
                 }
-                Length = location - startAddress;
+                Length = location - CSstartAddress;
 
             }
 
@@ -361,6 +375,7 @@ public class Assembler {
      * @throws IOException
      * @throws ClassNotFoundException
      */
+    //TODO : null pointer exception is because of "BASE" instn
     void pass2(File input, File output) throws IOException, ClassNotFoundException {
         //input file here is intermediate file which is listing file which is one that saves statement objects
         //output file is the HTME file
@@ -372,31 +387,49 @@ public class Assembler {
 
         {
 
+
             List<RecordCollector> mRecords = new ArrayList<>();
-            TEXT textRecord = new TEXT(startAddress);
-            int lastRecordAddress = startAddress;
+            TEXT textRecord = new TEXT(CSstartAddress);
+            int lastRecordAddress = CSstartAddress;
 
 
             while (istream.available() > 0)
             {
+
                 Statement statement = (Statement) objInputStream.readObject();
 
+                System.out.println("inside pass2 "+statement);
+                currentCS=statement.getCS();
                 if (statement.isComment())
                 {
                     continue;
                 }
                 //compare operation of statement object to "START"
-                if (statement.compareTo("START") == 0)
+
+                //new code for control sections added
+                if (statement.compareTo("START") == 0||statement.compareTo("CSECT") == 0)
                 {
 
-                    objectProgram.write(new Header(statement.label(), startAddress, Length).toObjectProgram() + '\n');
+                    objectProgram.write(new Header(statement.label(), CSstartAddress, Length).toObjectProgram() + '\n');
                 }
+                //K: try to make end record here and add CSECT to it too(it should make a new end record each time it sees one of them)
                 else if (statement.compareTo("END") == 0)
                 {
                     break;
                 }
+                else if (statement.compareTo("EXTREF") == 0)
+                {
+                    //TODO refer record
+                    break;
+                }
+                else if (statement.compareTo("EXTDEF") == 0)
+                {
+                    //TODO define record
+                    break;
+                }
                 else
                     {
+                        //gets object code of instruction
                     String objectCode = Instruction(statement);
 
                     // If it is format 4 and not immediate value
@@ -406,7 +439,7 @@ public class Assembler {
                     }
 
 //                    Uncomment next line to show the instruction and corresponding object code
-//                    System.out.println(statement + "\t\t" + objectCode);
+//                   System.out.println(statement + "\t\t" + objectCode);
 
                     if (statement.location() - lastRecordAddress >= 0x1000 || textRecord.add(objectCode) == false) {
                         objectProgram.write(textRecord.toObjectProgram() + '\n');
@@ -427,6 +460,7 @@ public class Assembler {
 
             objectProgram.write(new END(firstExecAddress).toObjectProgram() + '\n');
         }
+
     }
 
     private String Expression(Statement statement) {

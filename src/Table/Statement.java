@@ -29,6 +29,16 @@ public class Statement implements Serializable, Comparable {
     static char chracter2;
     private static boolean expression;
     static int size;
+    ControlSection CS;
+
+    public void setCS(ControlSection CS) {
+        this.CS = CS;
+    }
+
+    public ControlSection getCS() {
+        return CS;
+    }
+
     //constructor for a statement containing comments
     private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
