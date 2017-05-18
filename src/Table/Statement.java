@@ -139,8 +139,6 @@ public class Statement implements Serializable, Comparable {
                       for (int i=0;i<t.length;i++){
                           symbout[i]= symbols[i]=t[i];
 
-                          System.out.println(symbols[i]);
-
                       }
 
                   }

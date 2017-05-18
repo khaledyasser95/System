@@ -30,7 +30,7 @@ READ	 TD     MAXLEN1
          JLT    GOBACK
          SUB    #7
 GOBACK   RSUB
-EOFCK    COMP   #33
+EOFCK    COMP   33
          JEQ    EXIT
          COMP   #4
          JGT    READ
@@ -40,7 +40,7 @@ EXIT     CLEAR  L
 HEX      RESB   1
 MAXLEN1  EQU    5000
 MAXLEN2  EQU    *
-MAXLEN4  EQU    GETPAIR+READ-GETPAIR
+MAXLEN4  EQU    READ-GETPAIR
 ADDR2    RESB   1
 ADDR3    RESB   1
 ORADDR   RESB    2
