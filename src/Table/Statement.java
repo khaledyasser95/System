@@ -20,7 +20,7 @@ resource: https://www.tutorialspoint.com/java/java_serialization.htm
 public class Statement implements Serializable, Comparable {
     private final String Label;
     private final String Operation;
-    public  String[] Symbols;
+    public String[] Symbols;
     static String [] symbout;
     private final String _comment;
     private final boolean Extend;
@@ -38,7 +38,6 @@ public class Statement implements Serializable, Comparable {
     public ControlSection getCS() {
         return CS;
     }
-
     //constructor for a statement containing comments
     private Statement(String label, String operation, boolean extended, String[] symbols, String comment) {
         Label = label;
@@ -115,7 +114,7 @@ public class Statement implements Serializable, Comparable {
                 check=split[1];
                 if(check.equals("RSUB")||check.equals("CSECT") ) {
                     label = split[index++];
-                chracter=chracter2='R';
+                    chracter=chracter2='R';
                 }}
 
 
@@ -142,25 +141,25 @@ public class Statement implements Serializable, Comparable {
             if (index < split.length) {
                 value=split[index];
                 String[] t = value.split("(?=[-+*/()])|(?<=[^-+*/][-+*/])|(?<=[()])");
-              if (t.length>1){
-                  size=t.length;
-                  if (t[1]!=","){
-                      expression=true;
-                      for (int i=0;i<t.length;i++){
-                          symbout[i]= symbols[i]=t[i];
+                if (t.length>1){
+                    size=t.length;
+                    if (t[1]!=","){
+                        expression=true;
+                        for (int i=0;i<t.length;i++){
+                            symbout[i]= symbols[i]=t[i];
 
-                          System.out.println(symbols[i]);
+                            System.out.println(symbols[i]);
 
-                      }
+                        }
 
-                  }
-              }
-
-
+                    }
+                }
 
 
-  //checking if there are 2 operands (if comma is found then 2 operands)
-                 pos = split[index].indexOf(',');
+
+
+                //checking if there are 2 operands (if comma is found then 2 operands)
+                pos = split[index].indexOf(',');
 
                 // POS>0==0 because if not found index return -1
                 if (pos >= 0) {
@@ -169,13 +168,8 @@ public class Statement implements Serializable, Comparable {
                     symbols[0] = split[index].substring(0, pos);
                     //Take from pos and next one ,X
                     //gets the symbol, sign
-
-                    //no it gets the comma if multiple operands
-                     x=split[index].substring(pos, pos+1);
-
-                     //what if 3 labels this means symbols[1] will take 2 separated by comma todo
+                    x=split[index].substring(pos, pos+1);
                     symbols[1] = split[index].substring(pos + 1);
-
 
                     //this part is for checkuing if there are more than 2 operands
                     int k=1;
@@ -192,12 +186,11 @@ public class Statement implements Serializable, Comparable {
                     symbols[k+1]="kiko";
 
 
-
-
                     if (isNumeric(symbols[0]) || (symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') ){
                         type[0]='A';
                     }else  if (isNumeric(symbols[1]) || (symbols[1].charAt(0)=='@' || symbols[1].charAt(0)=='#') ){
                         type[1]='A';
+
                     }else  type[0]=type[1]='R';
 
                 } else {//else if only one operand
@@ -205,7 +198,7 @@ public class Statement implements Serializable, Comparable {
                     symbols[0] = split[index];
                     symbols[1] = null;
                     if ((isNumeric(symbols[0]) || symbols[0].charAt(0)=='@' || symbols[0].charAt(0)=='#') && (!operation.equals("RESW") && !operation.equals("RESB"))  ){
-                         type[0]='A';
+                        type[0]='A';
                     }else  type[0]='R';
                 }
             } else {//else if index>=split.length which means no operands
@@ -232,7 +225,7 @@ public class Statement implements Serializable, Comparable {
     }
 
     public void setoperand1(String x) {
-         Symbols[0]=x;
+        Symbols[0]=x;
     }
     public String operand1() {
         return Symbols[0];
