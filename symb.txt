@@ -2,34 +2,34 @@ MAIN        1000       A
 LOOP        101D       R
 GETPAIR     1028       R
 READ        1035       R
-GOBACK      1052        
+GOBACK      103B        
 EOFCK       33         A
-EXIT        1061       R
-HEX         1066       R
+EXIT        104A       R
+HEX         104F       R
 MAXLEN1     5000       A
-MAXLEN2     1067       R
+MAXLEN2     1050       R
 Wrong operation : EQU
-ADDR2       1067       R
-ADDR3       1068       R
-ORADDR      1069       R
-RTADDR      106B       R
-ADDR1       206B       R
+ADDR2       1050       R
+ADDR3       1051       R
+ORADDR      1052       R
+RTADDR      1054       R
+ADDR1       2054       R
 MAXLEN      4096       A
 ---------------------------------------------
-null    4096 A
-ORADDR    1069 R
-MAXLEN1    5000 A
-LOOP    101D R
-MAXLEN2    1067 R
-GETPAIR    1028 R
-GOBACK    1052 R
-READ    5000 A
-ADDR3    1068 R
-ADDR2    1067 R
-ADDR1    206B R
-MAXLEN    4096 A
-EOFCK    4181 A
-RTADDR    106B R
-MAIN    0 A
-HEX    1066 R
-EXIT    1061 R
+null        4096       A
+ORADDR      1052 H     R
+MAXLEN1     5000       A
+LOOP        101D H     R
+MAXLEN2     1050 H     R
+GETPAIR     1028 H     R
+GOBACK      103B H     R
+READ        5000       A
+ADDR3       1051 H     R
+ADDR2       1050 H     R
+ADDR1       2054 H     R
+MAXLEN      4096       A
+EOFCK       4158       A
+RTADDR      1054 H     R
+MAIN        0          A
+HEX         104F H     R
+EXIT        104A H     R

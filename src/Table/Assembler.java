@@ -314,10 +314,14 @@ public class Assembler {
             for (Map.Entry<String, Integer> entry : symbolTable.entrySet()) {
                 String key = entry.getKey();
                 int value = entry.getValue();
+                String print=null;
                 if(type.get(key)=='A'){
-                    y.println(key +"    " + value+ " A");
+                  //  y.println(key +"    " + value+ " A");
+                     print = String.format("%-10s  %-10s %s",key, value,"A");
                 }else
-                    y.println(key +"    " + Integer.toHexString(value).toUpperCase()+ " R");
+                    print = String.format("%-10s  %-10s %s",key, Integer.toHexString(value).toUpperCase()+" H","R");
+                y.println(print);
+                  //  y.println(key +"    " + Integer.toHexString(value).toUpperCase()+ " R");
                 //System.out.println ("Key: " + key + " Value: " + value);
                 //y.println(key +"    " + value);
             }
