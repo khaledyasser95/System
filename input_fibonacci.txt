@@ -21,6 +21,7 @@ GETPAIR  STL    MAXLEN1
          J      @RTADDR
 READ	 TD     MAXLEN1
          JEQ    READ
+         ORG    2000
          CLEAR  A
          RD     #15
          COMP   #48
@@ -29,6 +30,7 @@ READ	 TD     MAXLEN1
          COMP   #10
          JLT    GOBACK
          SUB    #7
+         ORG
 GOBACK   RSUB
 EOFCK    COMP   33
          JEQ    EXIT
