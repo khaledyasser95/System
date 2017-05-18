@@ -1,23 +1,17 @@
 MAIN        1000       A
 LOOP        101D       R
 GETPAIR     1028       R
-READ        #15        A
-HEY         103E       R
-GOBACK      105B        
+READ        1035       R
+GOBACK      1052        
 EOFCK       #33        A
-EXIT        106A       R
-MAXY        -11        A
-MAXLEN      106F       R
-MAXLEN2     106F       R
-MAXLEN3     3000       A
-MAXLEN4     103B       R
-HEX         106F       R
-ADDR2       1070       R
-ADDR3       1071       R
-ORADDR      1072       R
-RTADDR      1074       R
-ADDR1       1077       R
-MAXLEN6     4096       A
-KAREEM      1078        
-RDREC       3000       A
-WRREC       3000       A
+EXIT        1061       R
+HEX         1066       R
+MAXLEN1     5000       A
+MAXLEN2     1067       R
+Wrong operation : EQU
+ADDR2       1067       R
+ADDR3       1068       R
+ORADDR      1069       R
+RTADDR      106B       R
+ADDR1       206B       R
+MAXLEN      4096       A
