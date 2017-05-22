@@ -29,7 +29,7 @@ public class Assembler {
     private int baseAddress=0;
     ControlSection currentCS;
     int add;
-
+    int result=0;
     public Assembler() {
         //Pointing the optable to the operation in the instruction class
         opTable = Instruc.getOPERATIONTable();
@@ -138,19 +138,19 @@ public class Assembler {
                                 String Lablval=repo.get(statement.label());
 
                                 if (statement.isExpression()) {
-
-                                    System.out.println("EXPRESSION");
                                     if (Expression(statement).equals("A")){
                                         statement.chracter='A';
-                                        add=Integer.parseInt(statement.operand1());
+                                        add=result;
                                         currentCS.symbolTable.put(statement.label(), add);
-                                        // symbolTable.put(Lablval, add);
+                                        currentCS.symbolTable.put(Lablval, add);
+                                        type.put(Lablval, statement.chracter);
                                         type.put(statement.label(), statement.chracter);
-                                    }else if (Expression(statement).equals("A")){
+                                    }else if (Expression(statement).equals("R")){
                                         statement.chracter='R';
-                                        add=Integer.parseInt(statement.operand1());
+                                        add=result;
                                         currentCS.symbolTable.put(statement.label(), add);
-                                        //  symbolTable.put(Lablval, add);
+                                        currentCS.symbolTable.put(Lablval, add);
+                                        type.put(Lablval, statement.chracter);
                                         type.put(statement.label(), statement.chracter);
                                     }else
                                         throw new WrongOperation(statement);
@@ -163,26 +163,42 @@ public class Assembler {
                                     }
                                     currentCS.symbolTable.put(statement.label(), add);
                                     //symbolTable.put(Lablval, add);
+                                    type.put(Lablval, statement.chracter);
                                     type.put(statement.label(), statement.chracter);
-                                } else if (statement.operand1().charAt(0) == '*')
+                                } else if (statement.operand1().charAt(0) == '*') {
+                                    // operand = *
                                     add = location;
-                                currentCS.symbolTable.put(statement.label(), add);
-                                //  symbolTable.put(Lablval, add);
-                                type.put(statement.label(), statement.chracter);
+                                    currentCS. symbolTable.put(statement.label(), add);
+                                    currentCS.symbolTable.put(Lablval, add);
+                                    type.put(Lablval, statement.chracter);
+                                    type.put(statement.label(), statement.chracter);
+                                }
+                                else if (isNumeric(statement.operand1())){
+                                    statement.chracter='A';
+                                    add=Integer.parseInt(statement.operand1());
+                                    currentCS.symbolTable.put(statement.label(), add);
+                                    currentCS.symbolTable.put(Lablval, add);
+                                    type.put(Lablval, statement.chracter);
+                                    type.put(statement.label(), statement.chracter);
+                                }
                             }
                             else currentCS.symbolTable.put(statement.label(), location);
 
                             type.put(statement.label(), statement.chracter);
                             //made it print hexa:
-                            repo.put(statement.label(),statement.operand1());
-                            if (statement.chracter == 'A') {
+                            repo.put(statement.operand1(),statement.label());
+                            if (statement.chracter == 'A' && !statement.operation().equals("EQU") ) {
                                 String xx = String.format("%-10s  %-10s %s", statement.label(), statement.operand1(), statement.chracter);
                                 y.println(xx);
 
                             } else if (statement.operation().equals("EQU")) {
-                                String xx = String.format("%-10s  %-10s %s", statement.label(), Integer.toHexString(add).toUpperCase(), statement.chracter);
-                                y.println(xx);
+                                String xx=null;
+                                if (statement.chracter=='A')
+                                    xx = String.format("%-10s  %-10s %s", statement.label(), add, statement.chracter);
+                                else {
+                                    xx = String.format("%-10s  %-10s %s", statement.label(),Integer.toHexString(add).toUpperCase(), statement.chracter);
 
+                                }y.println(xx);
                             } else {
                                 String xx = String.format("%-10s  %-10s %s", statement.label(), Integer.toHexString(location).toUpperCase(), statement.chracter);
                                 y.println(xx);
@@ -210,7 +226,6 @@ public class Assembler {
                                     break;
                                 case 'X':
                                     location += (s.length() - 3) / 2; // X'05' -> 05 -> 2 half bytes
-
                                     break;
                             }
                             break;
@@ -361,14 +376,23 @@ public class Assembler {
                 Length = location - CSstartAddress;
 
             }
-            y.println("---------------------------------------------");
+            y.println("-----------------------UPDATED SYMBOL TABLE WITH EQU----------------------");
 
             for (Map.Entry<String, Integer> entry : currentCS.symbolTable.entrySet()) {
                 String key = entry.getKey();
                 int value = entry.getValue();
-                //    System.out.println ("Key: " + key + " Value: " + value);
-                // y.println(key +"    " + Integer.toHexString(value).toUpperCase());
+                String print=null;
+                if(type.get(key)=='A'){
+                    //  y.println(key +"    " + value+ " A");
+                    print = String.format("%-10s  %-10s %s",key, value,"A");
+                }else
+                    print = String.format("%-10s  %-10s %s",key, Integer.toHexString(value).toUpperCase()+" H","R");
+                y.println(print);
+                //  y.println(key +"    " + Integer.toHexString(value).toUpperCase()+ " R");
+                //System.out.println ("Key: " + key + " Value: " + value);
+                //y.println(key +"    " + value);
             }
+
 
         }//end try
     }
@@ -401,8 +425,8 @@ public class Assembler {
             while (istream.available() > 0) {
                 Statement statement = (Statement) objInputStream.readObject();
 
-                System.out.println("inside pass2 "+statement);
-                currentCS=statement.getCS();
+                //System.out.println("inside pass2 "+statement);
+               // currentCS=statement.getCS();
                 if (statement.isComment()) {
                     continue;
                 }
@@ -467,7 +491,6 @@ public class Assembler {
         while(index!=evodd){
             if(!statement.symbout[index].equals("-") && !statement.symbout[index].equals("+"))  {
                 counter++;
-                System.out.println("COUNTER : "+counter);
             }
             index++;
         }
@@ -478,7 +501,7 @@ public class Assembler {
         String TYPE = "";
         boolean even = false;
         int  location1, location2 = 0;
-        int result=0;
+
         int value1,value2=0;
         if (evodd > 4)
             even = false;
@@ -514,19 +537,22 @@ public class Assembler {
                 }
                 //System.out.println(inc+2);
                 expol += String.valueOf(typ);
-                //todo expo 1 not checkxp
                 TYPE += String.valueOf(checkexp(expol));
                 if (TYPE.length() - 1 == 2) {
+                    System.out.println(TYPE);
                     TYPE = String.valueOf(checkexp(TYPE));
 
                 } else if (even)
                     break;
-                else
-                    TYPE += sign;
-                if (statement.size - 1 > 4)
-                    val += 2;
-                else
-                    val = 1;
+                else{
+                    if (statement.size - 1 > 4)
+                        val += 2;
+                    else
+                        val = 1;
+                    TYPE += statement.symbout[val];
+                }
+
+
                 //String result = String.valueOf(value1-value2);
                 // statement.setoperand1(result);
                 if (statement.size - 1 > 4)
@@ -534,7 +560,7 @@ public class Assembler {
                 else
                     inc = 2;
             }
-            System.out.println(TYPE+" VALUE: "+result);
+
             statement.setoperand1(String.valueOf(result));
             return TYPE;
         } else {
@@ -545,17 +571,40 @@ public class Assembler {
                 //int value1=symbolTable.get(statement.symbout[inc]);
                 //int value2= symbolTable.get(statement.symbout[inc+2]);
                 //
+                if (isNumeric(statement.symbout[inc])) {
+                    typ = 'A';
+                    value1 = currentCS.symbolTable.get(statement.symbout[inc]);
+                } else {
+                    typ = type.get(statement.symbout[inc]);
+                    value1 = currentCS.symbolTable.get(statement.symbout[inc]);
+
+                }
+
                 typ = type.get(statement.symbout[inc]);
                 expol = String.valueOf(typ);
                 expol += statement.symbout[val];
                 sign = statement.symbout[val];
+
+                if (isNumeric(statement.symbout[inc + 2])) {
+                    typ = 'A';
+                    value2 = currentCS.symbolTable.get(statement.symbout[inc + 2]);
+                } else {
+                    typ = type.get(statement.symbout[inc + 2]);
+                    value2 = currentCS.symbolTable.get(statement.symbout[inc + 2]);
+                }
+                if (sign.equals("-")){
+                    result+=value1-value2;
+                }else if ( sign.equals("+")){
+                    result+=value1+value2;
+                }
+
                 typ = type.get(statement.symbout[inc + 2]);
-                System.out.println(inc + 2);
                 expol += String.valueOf(typ);
                 TYPE += String.valueOf(checkexp(expol));
                 TYPE += statement.symbout[val+2];
                 TYPE += type.get(statement.symbout[inc + 4]);
                 if (TYPE.length() - 1 == 2) {
+                    System.out.println(TYPE);
                     TYPE = String.valueOf(checkexp(TYPE));
                 } else
                     TYPE += sign;
@@ -575,7 +624,7 @@ public class Assembler {
         char c = ' ';
         switch (expression) {
             case ("R+R"):
-                c = 'x';
+                c = 'X';
                 break;
             case ("R-R"):
                 c = 'A';
@@ -593,8 +642,13 @@ public class Assembler {
                 c = 'R';
                 break;
             case ("A-R"):
-                c = 'x';
+                c = 'X';
                 break;
+            case ("A+R"):
+                c = 'X';
+                break;
+            default :
+                c = 'X';
         }
         return c;
     }

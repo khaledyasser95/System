@@ -15,7 +15,7 @@ ORADDR      1052       R
 RTADDR      1054       R
 ADDR1       2054       R
 MAXLEN      4096       A
----------------------------------------------
+-----------------------UPDATED SYMBOL TABLE WITH EQU----------------------
 null        4096       A
 ORADDR      1052 H     R
 MAXLEN1     5000       A
