@@ -1,35 +1,16 @@
-MAIN        1000       A
-LOOP        101D       R
-GETPAIR     1028       R
-READ        1035       R
-GOBACK      103B        
-EOFCK       33         A
-EXIT        104A       R
-HEX         104F       R
-MAXLEN1     5000       A
-MAXLEN2     1050       R
-Wrong operation : EQU
-ADDR2       1050       R
-ADDR3       1051       R
-ORADDR      1052       R
-RTADDR      1054       R
-ADDR1       2054       R
-MAXLEN      4096       A
+SUM         1000       A
+FIRST       #BEGIN     A
+LOOP        1008       R
+BEGIN       2000       R
+DUMP        2000       R
+FINAL       2003       R
+POS         3          A
 -----------------------UPDATED SYMBOL TABLE WITH EQU----------------------
-null        4096       A
-ORADDR      1052 H     R
-MAXLEN1     5000       A
-LOOP        101D H     R
-MAXLEN2     1050 H     R
-GETPAIR     1028 H     R
-GOBACK      103B H     R
-READ        5000       A
-ADDR3       1051 H     R
-ADDR2       1050 H     R
-ADDR1       2054 H     R
-MAXLEN      4096       A
-EOFCK       4158       A
-RTADDR      1054 H     R
-MAIN        0          A
-HEX         104F H     R
-EXIT        104A H     R
+null        3          A
+DUMP        2000 H     R
+POS         3          A
+LOOP        1008 H     R
+SUM         0          A
+FINAL       2003 H     R
+BEGIN       2000 H     R
+FIRST       4096       A

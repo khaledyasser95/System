@@ -1,54 +1,14 @@
-MAIN     START  1000
-         BASE   ADDR1
-         CLEAR  X
-         JSUB   GETPAIR
-         STCH   ADDR2
-         JSUB   GETPAIR
-         STCH   ADDR3
-         LDB    ADDR1
-         JSUB   GETPAIR
-         STCH   ADDR1
-         JSUB   GETPAIR
-         STCH   ADDR2
-LOOP     JSUB   GETPAIR
-        STCH   ADDR1,X
-         TIXR   X
-         J      LOOP
-GETPAIR  STL    MAXLEN1
-         JSUB   READ
-         STCH   HEX
-         OR     ORADDR
-         J      @RTADDR
-READ	 TD     MAXLEN1
-         JEQ    READ
+SUM      START  1000
+FIRST    +LDA    #BEGIN
+         +LDX    #FINAL
+LOOP     ADDR   X,A
+         TIX    #11
+         JLT    LOOP
+         +STA    #POS
          ORG    2000
-         CLEAR  A
-         RD     #15
-         COMP   #48
-         JLT    EOFCK
-         SUB    #48
-         COMP   #10
-         JLT    GOBACK
-         SUB    #7
-         ORG
-GOBACK   RSUB
-EOFCK    COMP   33
-         JEQ    EXIT
-         COMP   #4
-         JGT    READ
-EXIT     CLEAR  L
-         J      @ADDR1
-         END    MAIN
-HEX      RESB   1
-MAXLEN1  EQU    5000
-MAXLEN2  EQU    *
-MAXLEN4  EQU    READ-GETPAIR
-ADDR2    RESB   1
-ADDR3    RESB   1
-ORADDR   RESB    2
-RTADDR   RESB   4096
-ADDR1    RESB   1
-MAXLEN   EQU   4096
-         END    MAIN
-
+BEGIN    EQU    *
+DUMP     RESW   1
+FINAL    EQU    *
+POS      EQU    FINAL-BEGIN
+         END    SUM
 
