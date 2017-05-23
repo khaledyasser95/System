@@ -11,13 +11,13 @@ import java.util.Map;
 public class ControlSection implements Serializable {
     String name;
     ArrayList<String> externallyDefined;
-   // ArrayList<String> externalReference;
+    // ArrayList<String> externalReference;
     Map<String, Integer> symbolTable;
 
     public ControlSection(String name) {
         this.name = name;
         externallyDefined=new ArrayList<>(5);
-      //  externalReference=new ArrayList<>(5);
+        //  externalReference=new ArrayList<>(5);
         symbolTable = new HashMap<>();
         //Initializing the symbol table
         symbolTable.put(null, 0);

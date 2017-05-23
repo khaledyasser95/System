@@ -87,7 +87,8 @@ public class Statement implements Serializable, Comparable {
             //and makes a new statement using the comment only constructor
             return new Statement(statement.substring(statement.indexOf('.') + 1));
 
-        } else {
+        }
+        else {
 
             // If not so it will be Statement to be fetched
             String label, operation,value;
@@ -175,14 +176,16 @@ public class Statement implements Serializable, Comparable {
                     int k=1;
                     String manyOperands=symbols[k];
                     pos=manyOperands.indexOf(',');
+
+
                     while(pos>0)
                     {
-                        System.out.println(pos);
                         symbols[k]=manyOperands.substring(0,pos);
                         manyOperands=manyOperands.substring(pos+1);
                         k++;
                         pos=manyOperands.indexOf(',');
                     }
+                    symbols[k]=manyOperands;
                     symbols[k+1]="kiko";
 
 

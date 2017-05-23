@@ -144,12 +144,14 @@ public class Assembler {
                                         statement.chracter='A';
                                         add=Integer.parseInt(statement.operand1());
                                         currentCS.symbolTable.put(statement.label(), add);
+                                        System.out.println("put "+currentCS.name+" : "+statement.label()+"->"+add);
                                         // symbolTable.put(Lablval, add);
                                         type.put(statement.label(), statement.chracter);
                                     }else if (Expression(statement).equals("A")){
                                         statement.chracter='R';
                                         add=Integer.parseInt(statement.operand1());
                                         currentCS.symbolTable.put(statement.label(), add);
+                                        System.out.println("put "+currentCS.name+" : "+statement.label()+"->"+add);
                                         //  symbolTable.put(Lablval, add);
                                         type.put(statement.label(), statement.chracter);
                                     }else
@@ -159,18 +161,28 @@ public class Assembler {
                                     try {
                                         add = currentCS.symbolTable.get(statement.operand1());
                                     } catch (Exception F) {
+
                                         throw new Forward(statement);
                                     }
                                     currentCS.symbolTable.put(statement.label(), add);
+                                    System.out.println("put "+currentCS.name+" : "+statement.label()+"->"+add);
+                                    // System.out.println("k put in symtab "+statement.label());
                                     //symbolTable.put(Lablval, add);
                                     type.put(statement.label(), statement.chracter);
                                 } else if (statement.operand1().charAt(0) == '*')
                                     add = location;
                                 currentCS.symbolTable.put(statement.label(), add);
+                                System.out.println("put "+currentCS.name+" : "+statement.label()+"->"+add);
+                                //System.out.println("k put in symtab "+statement.label()+" "+currentCS.name);
                                 //  symbolTable.put(Lablval, add);
                                 type.put(statement.label(), statement.chracter);
                             }
-                            else currentCS.symbolTable.put(statement.label(), location);
+                            else {
+                                currentCS.symbolTable.put(statement.label(), location);
+                                System.out.println("put "+currentCS.name+" : "+statement.label()+"->"+add);
+                                // System.out.println("k put in symtab "+statement.label()+" "+currentCS.name);
+                            }
+
 
                             type.put(statement.label(), statement.chracter);
                             //made it print hexa:
@@ -199,6 +211,7 @@ public class Assembler {
                             CSstartAddress= startAddress = Integer.parseInt(statement.operand1(), 16);
                             currentCS.setName(statement.label());
                             statement.setLocation(location = startAddress);
+                            System.out.println("===================start=========================");
                             break;
                         case "BYTE":
                             String s = statement.operand1();
@@ -252,9 +265,9 @@ public class Assembler {
                             break;
                         case "CSECT":
                             //control section names are concidered as external symbols
-                            currentCS.externallyDefined.add(statement.label());
+                            //   currentCS.externallyDefined.add(statement.label());
                             //set location of new control section to zero
-
+                            System.out.println("=====================csect=======================");
                             CSstartAddress= location=0;
                             firstExecAddress=-1;
                             statement.setLocation(location);
@@ -265,14 +278,14 @@ public class Assembler {
                         case "EXTDEF":
 
                             //statement.setLocation(location);
+                            int i=0;
 
-                            for (int i = 0; i <8; i++)
+                            while (i<8&&!statement.Symbols[i].equalsIgnoreCase("kiko") &&statement.Symbols[i] !=null)
                             {
-                                if (statement.Symbols[i] !="kiko"&&statement.Symbols[i] !=null)
-                                {
-                                    currentCS.externallyDefined.add(statement.Symbols[i]);
-                                }
+                                currentCS.externallyDefined.add(statement.Symbols[i]);
+                                i++;
                             }
+
 
 
                             break;
@@ -280,26 +293,37 @@ public class Assembler {
 
                             //statement.setLocation(location);
                             //TODO: check if they are externally defined in a control section befor adding them to symtab
-                            for (int i = 2; i <8; i++)
-                            {
-                                String operand=statement.Symbols[i];
-                                ControlSection cs=null;
-                                //loop all control sections to check if each label beside extrefrence
-                                //is externally defined in a control section
-                                //if so add it to symbol tabel of control section
-                                for (int j = 0; j < controlSections.size(); j++) {
+                            //why did  I start i at 2 ?
 
-                                    cs=controlSections.get(j);
 
-                                    if (cs.searchExtDef(operand)!=null&&operand !="kiko"&&operand !=null)
-                                    {
+                            int l=0;
+                            String operand=statement.Symbols[l];
+                            //loop all control sections to check if each label beside extrefrence
+                            //is externally defined in a control section
+                            //if so add it to symbol tabel of control section
+                            while (l<8 && !operand.equalsIgnoreCase("kiko") && operand != null) {
+
+                                //give it value zero as address
+                                //  System.out.println("putting "+operand+" in table currnent csect is "+currentCS.name);
+                                //I put location instead of 0 as second argument
+                                currentCS.symbolTable.put(operand, location);
+                                l++;
+                                operand=statement.Symbols[l];
+                            }
+                            //TODO cancel this check bec if not yet defined CS
+                              /*  for (ControlSection controlSection : controlSections) {
+
+                                    cs = controlSection;
+
+                                    if (cs.searchExtDef(operand) != null && !Objects.equals(operand, "kiko") && operand != null) {
                                         //give it value zero as address
-                                        currentCS.symbolTable.put(operand,0);
+                                        System.out.println("putting "+operand+" in table currnent csect is "+currentCS);
+                                        currentCS.symbolTable.put(operand, 0);
                                     }
                                 }
+                              */
 
 
-                            }
                             break;
 
 
@@ -384,6 +408,14 @@ public class Assembler {
     void pass2(File input, File output) throws IOException, ClassNotFoundException {
         //input file here is intermediate file which is listing file which is one that saves statement objects
         //output file is the HTME file
+        for(int i=0;i<controlSections.size();i++)
+        {
+            currentCS=controlSections.get(i);
+            for (String s:currentCS.symbolTable.keySet()) {
+                System.out.printf("%s:%s->%X\n",currentCS.name,s,currentCS.symbolTable.get(s));
+            }
+
+        }
         try (FileInputStream istream = new FileInputStream(input);
              ObjectInputStream objInputStream = new ObjectInputStream(istream);
              FileWriter objectProgram = new FileWriter(output)
@@ -401,8 +433,9 @@ public class Assembler {
             while (istream.available() > 0) {
                 Statement statement = (Statement) objInputStream.readObject();
 
-                System.out.println("inside pass2 "+statement);
-                currentCS=statement.getCS();
+                //System.out.println("inside pass2 "+statement);
+                String csName=statement.getCS().name;
+                currentCS=searchCSsByName(csName);
                 if (statement.isComment()) {
                     continue;
                 }
@@ -416,15 +449,16 @@ public class Assembler {
                 //K: try to make end record here and add CSECT to it too(it should make a new end record each time it sees one of them)
                 else if (statement.compareTo("END") == 0) {
                     break;
-                } else if (statement.compareTo("EXTREF") == 0)
+                }
+                else if (statement.compareTo("EXTREF") == 0)
                 {
                     //TODO refer record
-                    break;
+
                 }
                 else if (statement.compareTo("EXTDEF") == 0)
                 {
                     //TODO define record
-                    break;
+
                 }
                 else
                 {
@@ -439,7 +473,7 @@ public class Assembler {
 //                    Uncomment next line to show the instruction and corresponding object code
 //                    System.out.println(statement + "\t\t" + objectCode);
 
-                    if (statement.location() - lastRecordAddress >= 0x1000 || textRecord.add(objectCode) == false) {
+                    if (statement.location() - lastRecordAddress >= 0x1000 || !textRecord.add(objectCode)) {
                         objectProgram.write(textRecord.toObjectProgram() + '\n');
 
                         textRecord = new TEXT(statement.location());
@@ -458,6 +492,16 @@ public class Assembler {
 
             objectProgram.write(new END(firstExecAddress).toObjectProgram() + '\n');
         }
+    }
+
+    private ControlSection searchCSsByName(String csName) {
+        for (int i = 0; i <controlSections.size() ; i++) {
+            if(controlSections.get(i).name.equalsIgnoreCase(csName))
+            {
+                return controlSections.get(i);
+            }
+        }
+        return null;
     }
 
     private String Expression(Statement statement) {
@@ -667,21 +711,24 @@ public class Assembler {
                         }
 
                         try {
+
                             int disp;
                             //if operand is not a label
-
+                            //currentCS.symbolTable.keySet().forEach(System.out::println);
+                            //  System.out.println("trying to find "+operand+"in CS "+currentCS.name);
                             if (currentCS.symbolTable.get(operand) == null) {
-
                                 disp = Integer.parseInt(operand);
+                                System.out.println("not found "+operand+" in sym table");
 
                             } else {
+
                                 //GETS LOCATION OF THE OPERAND INSIDE SYMBOL TABLE IN DECIMAL
                                 int targetAddress = currentCS.symbolTable.get(operand);
-
+                                System.out.println("found "+operand+" in sym table");
 
                                 disp = targetAddress;
 
-                                if (statement.isExtended() == false) {
+                                if (!statement.isExtended()) {
                                     //System.out.println(statement.location() + " HEY " + label);
                                     disp -= statement.location() + 3;
                                     //if pc relative
